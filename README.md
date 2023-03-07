@@ -24,7 +24,11 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+The e-commerce app built with Node.js, Nest framework, MongoDB, and JWT offers a comprehensive set of features to support the entire shopping experience for customers. Users can register and login securely using JWT authentication, search and browse the product catalog, add products to their cart, and complete the checkout process with ease.
+
+For example, a user can search for a product, add it to their cart, and choose a payment method. Once the payment is processed, the order is created and the user can track the status of their order from the app. Additionally, the app offers customer support features, such as the ability to create support tickets and get assistance with any issues that may arise.
+
+Overall, the e-commerce app provides a seamless shopping experience that is secure, user-friendly, and efficient, making it a great choice for businesses looking to create a successful online store.
 
 ## Installation
 
