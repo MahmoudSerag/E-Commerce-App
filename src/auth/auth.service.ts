@@ -24,6 +24,7 @@ export class AuthService {
         statusCode: 201,
         isOTPSent: true,
         message: 'Verify your mail.',
+        userId: user._id,
       };
     } catch (error) {
       return {
@@ -31,6 +32,7 @@ export class AuthService {
         statusCode: error.code,
         isOTPSent: false,
         message: error.message,
+        userId: '',
       };
     }
   }
