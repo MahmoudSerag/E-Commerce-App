@@ -30,7 +30,7 @@ export class EmailService {
     };
   }
 
-  public async sendEmail(userMail: string, otpCode: number) {
+  public async sendEmail(userMail: string, otpCode: number): Promise<void> {
     const mailOptions = this.generateMailOptions(userMail, otpCode);
     const handlebarsOptions = this.generateHandlebarOptions();
 

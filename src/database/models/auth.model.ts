@@ -7,8 +7,8 @@ import { Auth } from '../../auth/interface/auth.interface';
 @Injectable()
 export class AuthModel {
   constructor(@InjectModel('User') private readonly authModel: Model<Auth>) {}
-  async findUserByEmail(email: string) {
-    return (await this.authModel.findOne({ email }).lean()) ? true : false;
+  async findUserByEmail(email: string): Promise<{ _id: { _id: object } }> {
+    return await this.authModel.findOne({ email }).select('_id').lean();
   }
 
   async createNewUser(email: string, otpCode: number) {
