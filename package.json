@@ -23,6 +23,7 @@
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.3.1",
     "@nestjs/core": "^9.0.0",
+    "@nestjs/jwt": "^10.0.2",
     "@nestjs/mongoose": "^9.2.1",
     "@nestjs/platform-express": "^9.0.0",
     "class-transformer": "^0.5.1",
@@ -30,6 +31,7 @@
     "mongoose": "^6.10.2",
     "nodemailer": "^6.9.1",
     "nodemailer-express-handlebars": "^6.1.0",
+    "passport-jwt": "^4.0.1",
     "path": "^0.12.7",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.2.0"
