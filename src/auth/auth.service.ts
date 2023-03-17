@@ -12,11 +12,11 @@ export class AuthService {
   ) {}
   async login(email: string): Promise<object> {
     try {
-      const user = await this.authQueries.findUserByEmail(email);
+      let user = await this.authQueries.findUserByEmail(email);
 
       const otpCode = this.emailService.generateOTPCode();
 
-      if (!user) await this.authQueries.createNewUser(email, otpCode);
+      if (!user) user = await this.authQueries.createNewUser(email, otpCode);
       else await this.authQueries.updateUserOTP(email, otpCode);
 
       await this.emailService.sendEmail(email, otpCode);
@@ -42,6 +42,8 @@ export class AuthService {
   async verifyEmail(otpCode: number, userId: string): Promise<object> {
     try {
       const user = await this.authQueries.findUserById(userId);
+
+      if (!user) throw new HttpException('Not found.', HttpStatus.NOT_FOUND);
 
       // Check if otpCode expired
       const isOtpExpired =
