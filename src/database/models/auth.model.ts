@@ -27,15 +27,9 @@ export class AuthModel {
     await this.authModel.findOneAndUpdate({ email }, { otpCode, otpCreatedAt });
   }
 
-  async findUserById(userId: string): Promise<{
-    otpCode: number;
-    email: string;
-    _id: string;
-    otpCreatedAt: any;
-  }> {
+  async findUserById(userId: string): Promise<any> {
     return await this.authModel
       .findById(userId)
-      .select('otpCode email otpCreatedAt')
-      .lean();
+      .select('otpCode email otpCreatedAt');
   }
 }
