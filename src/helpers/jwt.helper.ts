@@ -9,7 +9,7 @@ export class JWTService {
     return this.jwtService.sign(payload);
   }
 
-  public verifyJWT(token: string): object {
+  public verifyJWT(token: string): { email: string; id: string } {
     return this.jwtService.verify(token);
   }
 }

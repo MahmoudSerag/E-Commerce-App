@@ -11,5 +11,9 @@ import { EmailService } from 'src/helpers/email.helper';
   imports: [MongooseModule.forFeature([{ name: 'User', schema: UserSchema }])],
   controllers: [AuthController],
   providers: [AuthService, EmailService, AuthModel],
+  exports: [
+    AuthService,
+    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
+  ],
 })
 export class AuthModule {}

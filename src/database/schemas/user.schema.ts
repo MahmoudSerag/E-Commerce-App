@@ -26,7 +26,11 @@ export const UserSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    fullName: {
+    firstName: {
+      type: String,
+      required: false,
+    },
+    lastName: {
       type: String,
       required: false,
     },
