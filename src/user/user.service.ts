@@ -21,9 +21,7 @@ export class UserService {
 
       const user = await this.userModel.findUserById(decodedToken.id);
 
-      if (!user) {
-        return this.errorResponse.handleError(res, 'not found');
-      }
+      if (!user) return this.errorResponse.handleError(res, 'not found');
 
       return {
         email: user.email,

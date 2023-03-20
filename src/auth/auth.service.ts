@@ -1,14 +1,16 @@
-import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
+import { ErrorResponse } from 'src/helpers/errorHandling.helper';
+import { Injectable, Res } from '@nestjs/common';
 import { EmailService } from 'src/helpers/email.helper';
 import { AuthModel } from 'src/database/models/auth.model';
 import { JWTService } from 'src/helpers/jwt.helper';
-
+import { Response } from 'express';
 @Injectable()
 export class AuthService {
   constructor(
     private readonly emailService: EmailService,
     private readonly authQueries: AuthModel,
     private readonly jwtService: JWTService,
+    private readonly errorResponse: ErrorResponse,
   ) {}
   async login(email: string): Promise<object> {
     try {
@@ -39,24 +41,30 @@ export class AuthService {
     }
   }
 
-  async verifyEmail(otpCode: number, userId: string): Promise<object> {
+  async verifyEmail(
+    otpCode: number,
+    userId: string,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     try {
       const user = await this.authQueries.findUserById(userId);
 
-      if (!user) throw new HttpException('Not found.', HttpStatus.NOT_FOUND);
+      if (!user) return this.errorResponse.handleError(res, 'not found');
 
-      // Check if otpCode expired
-      const isOtpExpired =
-        (Date.now() - user.otpCreatedAt) / (1000 * 60) >
-        parseInt(process.env.OTP_CODE_EXPIRES_IN);
+      if (!user.otpCreatedAt || !user.otpCode)
+        return this.errorResponse.handleError(res, 'code expired');
+
+      const isOtpExpired: boolean =
+        (Date.now() - user.otpCreatedAt) / (1000 * 60) >= 15;
       if (user.otpCode !== otpCode || isOtpExpired)
-        throw new HttpException(
-          'Incorrect or expired code, Try again.',
-          HttpStatus.BAD_REQUEST,
-        );
+        return this.errorResponse.handleError(res, 'code expired');
 
       const payload = { email: user.email, id: user._id };
       const accessToken = this.jwtService.signJWT(payload);
+
+      user.otpCode = null;
+      user.otpCreatedAt = null;
+      user.save();
 
       return {
         success: true,
@@ -65,12 +73,7 @@ export class AuthService {
         accessToken,
       };
     } catch (error) {
-      return {
-        success: false,
-        statusCode: error.status || error.code || 500,
-        message: error.message,
-        token: '',
-      };
+      return this.errorResponse.handleError(res, error.message);
     }
   }
 }

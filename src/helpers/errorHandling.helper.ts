@@ -50,6 +50,14 @@ export class ErrorResponse {
     });
   }
 
+  private codeExpired(@Res() res: Response) {
+    return res.status(400).json({
+      success: false,
+      statusCode: HttpStatus.BAD_REQUEST,
+      message: 'Incorrect or expired code.',
+    });
+  }
+
   private serverError(@Res() res: Response) {
     return res.status(500).json({
       success: false,
@@ -60,10 +68,11 @@ export class ErrorResponse {
 
   public handleError(@Res() res: Response, message: string) {
     if (message === 'invalid signature') this.invalidSignature(res);
-    else if (message === 'invalid signature') this.invalidToken(res);
+    else if (message === 'invalid token') this.invalidToken(res);
     else if (message === 'not found') this.notFound(res);
     else if (message === 'forbidden') this.forbidden(res);
-    else if (message.startsWith('Cast')) this.badRequest(res);
+    else if (message.startsWith('Cast') || message === 'code expired')
+      this.badRequest(res);
     else if (message === 'unauthorized') this.unauthorized(res);
     else this.serverError(res);
   }

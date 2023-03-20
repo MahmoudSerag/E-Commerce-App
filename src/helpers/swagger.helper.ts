@@ -16,14 +16,14 @@ export const apiUnauthorizedResponse = {
   },
 };
 
-export const apiInvalidJWTResponse = {
-  status: 401,
-  description: 'JWT invalid token.',
+export const apiBadRequestResponse = {
+  status: 403,
+  description: 'Bad request.',
   schema: {
     example: {
       success: false,
-      statusCode: 401,
-      message: 'Invalid token OR Invalid signature.',
+      statusCode: 403,
+      message: 'Bad request.',
     },
   },
 };
@@ -40,7 +40,7 @@ export const apiNotFoundResponse = {
   },
 };
 
-export const apiNotForbiddenResponse = {
+export const apiForbiddenResponse = {
   status: 403,
   description: 'User not allowed to see this content.',
   schema: {

@@ -17,10 +17,9 @@ async function bootstrap() {
     .setDescription('E-Commerce APIs description')
     .setVersion('1.0')
     .addTag('APIs')
-    .addServer('localhost:5000')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api/docs', app, document);
 
   const port = process.env.PORT || 3000;
   await app.listen(port, () => {
