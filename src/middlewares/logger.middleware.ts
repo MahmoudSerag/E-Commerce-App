@@ -1,27 +1,21 @@
-import {
-  Injectable,
-  NestMiddleware,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { ErrorResponse } from 'src/helpers/errorHandling.helper';
+import { Injectable, NestMiddleware } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 
 @Injectable()
 export class LoggerMiddleware implements NestMiddleware {
+  constructor(private readonly errorResponse: ErrorResponse) {}
+
   use(req: Request, res: Response, next: NextFunction) {
     if (
       !req.headers ||
-      !req.headers['x-authorization'] ||
-      !req.headers['x-authorization'].slice(7)
+      !req.headers.authorization ||
+      !req.headers.authorization.startsWith('Bearer')
     )
-      throw new HttpException(
-        {
-          success: false,
-          statusCode: HttpStatus.UNAUTHORIZED,
-          message: 'Unauthorized.',
-        },
-        HttpStatus.UNAUTHORIZED,
-      );
+      return this.errorResponse.handleError(res, 'unauthorized');
+
+    const accessToken: any = req.headers.authorization.split(' ')[1];
+    res.locals = accessToken;
 
     next();
   }

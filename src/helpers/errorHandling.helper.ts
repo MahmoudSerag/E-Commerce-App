@@ -61,11 +61,11 @@ export class ErrorResponse {
   public handleError(@Res() res: Response, message: string) {
     if (message === 'invalid signature') this.invalidSignature(res);
     else if (message === 'invalid token') this.invalidToken(res);
+    else if (message === 'unauthorized') this.unauthorized(res);
     else if (message === 'not found') this.notFound(res);
     else if (message === 'forbidden') this.forbidden(res);
     else if (message.startsWith('Cast') || message === 'code expired')
       this.badRequest(res);
-    else if (message === 'unauthorized') this.unauthorized(res);
     else this.serverError(res);
   }
 }
