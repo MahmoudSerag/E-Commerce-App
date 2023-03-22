@@ -17,12 +17,12 @@ export const apiUnauthorizedResponse = {
 };
 
 export const apiBadRequestResponse = {
-  status: 403,
+  status: 400,
   description: 'Bad request.',
   schema: {
     example: {
       success: false,
-      statusCode: 403,
+      statusCode: 400,
       message: 'Bad request.',
     },
   },

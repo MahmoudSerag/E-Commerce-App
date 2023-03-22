@@ -22,16 +22,35 @@ import {
   ApiNotFoundResponse,
   ApiCreatedResponse,
   ApiParam,
+  ApiTags,
 } from '@nestjs/swagger';
 
 @Controller('api/v1/auth/')
+@ApiTags('Auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @ApiCreatedResponse({
+    status: 201,
+    description: 'Verify email',
+    schema: {
+      example: {
+        success: true,
+        statusCode: 201,
+        message: 'Verify your email.',
+        userId: '56cb91bdc3464f14678934ca',
+      },
+    },
+  })
+  @ApiBadRequestResponse(apiBadRequestResponse)
+  @ApiInternalServerErrorResponse(apiInternalServerErrorResponse)
   @Post('login')
   @UsePipes(ValidationPipe)
-  login(@Body() body: authDto): object {
-    return this.authService.login(body.email);
+  login(
+    @Body() body: authDto,
+    @Res({ passthrough: true }) res: Response,
+  ): object {
+    return this.authService.login(body.email, res);
   }
 
   @ApiParam({
