@@ -1,9 +1,3 @@
-export const apiHeader = {
-  name: 'x-authorization',
-  description: 'JWT',
-  required: true,
-};
-
 export const apiUnauthorizedResponse = {
   status: 401,
   description: 'User not loggedIn.',

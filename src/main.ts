@@ -17,6 +17,18 @@ async function bootstrap() {
     .setDescription('E-Commerce APIs description')
     .setVersion('1.0')
     .addTag('APIs')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'JWT-auth',
+    )
+    .addServer(process.env.BACK_DOMAIN)
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
