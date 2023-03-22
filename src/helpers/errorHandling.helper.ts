@@ -50,14 +50,6 @@ export class ErrorResponse {
     });
   }
 
-  private codeExpired(@Res() res: Response) {
-    return res.status(400).json({
-      success: false,
-      statusCode: HttpStatus.BAD_REQUEST,
-      message: 'Incorrect or expired code.',
-    });
-  }
-
   private serverError(@Res() res: Response) {
     return res.status(500).json({
       success: false,

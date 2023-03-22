@@ -12,7 +12,10 @@ export class AuthService {
     private readonly jwtService: JWTService,
     private readonly errorResponse: ErrorResponse,
   ) {}
-  async login(email: string): Promise<object> {
+  async login(
+    email: string,
+    @Res({ passthrough: true }) res: Response,
+  ): Promise<any> {
     try {
       let user = await this.authQueries.findUserByEmail(email);
 
@@ -31,13 +34,7 @@ export class AuthService {
         userId: user._id,
       };
     } catch (error) {
-      return {
-        success: false,
-        statusCode: error.status || error.code || 500,
-        isOTPSent: false,
-        message: error.message,
-        userId: '',
-      };
+      return this.errorResponse.handleError(res, error.message);
     }
   }
 
@@ -45,7 +42,7 @@ export class AuthService {
     otpCode: number,
     userId: string,
     @Res({ passthrough: true }) res: Response,
-  ) {
+  ): Promise<any> {
     try {
       const user = await this.authQueries.findUserById(userId);
 
