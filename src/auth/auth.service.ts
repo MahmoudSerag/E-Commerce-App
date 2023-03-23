@@ -1,9 +1,8 @@
 import { ErrorResponse } from 'src/helpers/errorHandling.helper';
-import { Injectable, Res } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { EmailService } from 'src/helpers/email.helper';
 import { AuthModel } from 'src/database/models/auth.model';
 import { JWTService } from 'src/helpers/jwt.helper';
-import { Response } from 'express';
 @Injectable()
 export class AuthService {
   constructor(
@@ -12,10 +11,7 @@ export class AuthService {
     private readonly jwtService: JWTService,
     private readonly errorResponse: ErrorResponse,
   ) {}
-  async login(
-    email: string,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<any> {
+  async login(email: string): Promise<any> {
     try {
       let user = await this.authQueries.findUserByEmail(email);
 
@@ -34,27 +30,25 @@ export class AuthService {
         userId: user._id,
       };
     } catch (error) {
-      return this.errorResponse.handleError(res, error.message);
+      return this.errorResponse.handleError(error.message);
     }
   }
 
-  async verifyEmail(
-    otpCode: number,
-    userId: string,
-    @Res({ passthrough: true }) res: Response,
-  ): Promise<any> {
+  async verifyEmail(otpCode: number, userId: string): Promise<any> {
     try {
       const user = await this.authQueries.findUserById(userId);
 
-      if (!user) return this.errorResponse.handleError(res, 'not found');
+      if (!user) return this.errorResponse.handleError('Not found.');
 
-      if (!user.otpCreatedAt || !user.otpCode)
-        return this.errorResponse.handleError(res, 'code expired');
+      if (!user.otpCreatedAt || !user.otpCode) {
+        return this.errorResponse.handleError('Bad request.');
+      }
 
       const isOtpExpired: boolean =
         (Date.now() - user.otpCreatedAt) / (1000 * 60) >= 15;
-      if (user.otpCode !== otpCode || isOtpExpired)
-        return this.errorResponse.handleError(res, 'code expired');
+      if (user.otpCode !== otpCode || isOtpExpired) {
+        return this.errorResponse.handleError('Bad request.');
+      }
 
       const payload = { email: user.email, id: user._id };
       const accessToken = this.jwtService.signJWT(payload);
@@ -70,7 +64,7 @@ export class AuthService {
         accessToken,
       };
     } catch (error) {
-      return this.errorResponse.handleError(res, error.message);
+      return this.errorResponse.handleError(error.message);
     }
   }
 }

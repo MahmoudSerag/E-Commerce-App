@@ -15,4 +15,13 @@ export class UserModel {
       .select('email firstName lastName -_id')
       .lean();
   }
+
+  async updateUserById(
+    userId: string,
+    body: { firstName: string; lastName: string },
+  ): Promise<{ firstName: string; lastName: string }> {
+    await this.userModel.findByIdAndUpdate(userId, body);
+
+    return { firstName: body.firstName, lastName: body.lastName };
+  }
 }
