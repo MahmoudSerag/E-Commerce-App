@@ -1,71 +1,85 @@
-import { Res } from '@nestjs/common';
-import { Response } from 'express';
+import {
+  BadRequestException,
+  ForbiddenException,
+  InternalServerErrorException,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { HttpStatus } from '@nestjs/common';
 
 export class ErrorResponse {
-  private unauthorized(@Res() res: Response) {
-    return res.status(401).json({
+  private unauthorized() {
+    throw new UnauthorizedException({
       success: false,
       statusCode: HttpStatus.UNAUTHORIZED,
-      message: 'Unauthorized',
+      message: 'Unauthorized.',
     });
   }
-  private invalidToken(@Res() res: Response) {
-    return res.status(401).json({
+  private invalidToken() {
+    throw new UnauthorizedException({
       success: false,
       statusCode: HttpStatus.UNAUTHORIZED,
       message: 'Invalid token.',
     });
   }
 
-  private invalidSignature(@Res() res: Response) {
-    return res.status(401).json({
+  private invalidSignature() {
+    throw new UnauthorizedException({
       success: false,
       statusCode: HttpStatus.UNAUTHORIZED,
       message: 'Invalid signature.',
     });
   }
 
-  private notFound(@Res() res: Response) {
-    return res.status(404).json({
+  private notFound() {
+    throw new NotFoundException({
       success: false,
       statusCode: HttpStatus.NOT_FOUND,
       message: 'Not found.',
     });
   }
 
-  private forbidden(@Res() res: Response) {
-    return res.status(403).json({
+  private forbidden() {
+    throw new ForbiddenException({
       success: false,
       statusCode: HttpStatus.FORBIDDEN,
       message: 'Forbidden.',
     });
   }
 
-  private badRequest(@Res() res: Response) {
-    return res.status(400).json({
+  private badRequest() {
+    throw new BadRequestException({
       success: false,
       statusCode: HttpStatus.BAD_REQUEST,
       message: 'Bad request.',
     });
   }
 
-  private serverError(@Res() res: Response) {
-    return res.status(500).json({
+  private jwtExpired() {
+    throw new UnauthorizedException({
       success: false,
-      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      message: 'Server error.',
+      statusCode: HttpStatus.UNAUTHORIZED,
+      message: 'Jwt expired.',
     });
   }
 
-  public handleError(@Res() res: Response, message: string) {
-    if (message === 'invalid signature') this.invalidSignature(res);
-    else if (message === 'invalid token') this.invalidToken(res);
-    else if (message === 'unauthorized') this.unauthorized(res);
-    else if (message === 'not found') this.notFound(res);
-    else if (message === 'forbidden') this.forbidden(res);
-    else if (message.startsWith('Cast') || message === 'code expired')
-      this.badRequest(res);
-    else this.serverError(res);
+  private serverError() {
+    throw new InternalServerErrorException({
+      success: false,
+      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+      message: 'Internal server error.',
+    });
+  }
+
+  public handleError(message: string) {
+    if (message === 'invalid signature') this.invalidSignature();
+    else if (message === 'invalid token') this.invalidToken();
+    else if (message === 'unauthorized') this.unauthorized();
+    else if (message === 'Not found.') this.notFound();
+    else if (message === 'forbidden') this.forbidden();
+    else if (message === 'jwt expired') this.jwtExpired();
+    else if (message.startsWith('Cast') || message === 'Bad request.')
+      this.badRequest();
+    else this.serverError();
   }
 }

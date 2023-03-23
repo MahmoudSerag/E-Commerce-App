@@ -6,9 +6,8 @@ import {
   UsePipes,
   ValidationPipe,
   Param,
-  Res,
+  BadRequestException,
 } from '@nestjs/common';
-import { Response } from 'express';
 import { authDto } from './dto/auth.dto';
 import { otpCodeDto } from './dto/otp.dto';
 import {
@@ -45,12 +44,19 @@ export class AuthController {
   @ApiBadRequestResponse(apiBadRequestResponse)
   @ApiInternalServerErrorResponse(apiInternalServerErrorResponse)
   @Post('login')
-  @UsePipes(ValidationPipe)
-  login(
-    @Body() body: authDto,
-    @Res({ passthrough: true }) res: Response,
-  ): object {
-    return this.authService.login(body.email, res);
+  @UsePipes(
+    new ValidationPipe({
+      exceptionFactory() {
+        throw new BadRequestException({
+          success: false,
+          statusCode: 400,
+          message: 'Bad request',
+        });
+      },
+    }),
+  )
+  login(@Body() body: authDto): object {
+    return this.authService.login(body.email);
   }
 
   @ApiParam({
@@ -75,12 +81,21 @@ export class AuthController {
   @ApiBadRequestResponse(apiBadRequestResponse)
   @ApiInternalServerErrorResponse(apiInternalServerErrorResponse)
   @Post('verify-email/:userId')
-  @UsePipes(ValidationPipe)
+  @UsePipes(
+    new ValidationPipe({
+      exceptionFactory() {
+        throw new BadRequestException({
+          success: false,
+          statusCode: 400,
+          message: 'Bad request',
+        });
+      },
+    }),
+  )
   verifyEmail(
     @Body() body: otpCodeDto,
     @Param('userId') userId: string,
-    @Res({ passthrough: true }) res: Response,
   ): object {
-    return this.authService.verifyEmail(body.otpCode, userId, res);
+    return this.authService.verifyEmail(body.otpCode, userId);
   }
 }
