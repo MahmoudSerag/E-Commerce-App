@@ -10,7 +10,7 @@ export class UserService {
     private readonly errorResponse: ErrorResponse,
   ) {}
 
-  async getUserBasicInfo(accessToken: string) {
+  async getUserBasicInfo(accessToken: string): Promise<any> {
     try {
       const decodedToken = this.jwtService.verifyJWT(accessToken);
 
@@ -36,7 +36,7 @@ export class UserService {
   async updateNameForLoggedInUser(
     body: { firstName: string; lastName: string },
     accessToken: string,
-  ) {
+  ): Promise<any> {
     try {
       const decodedToken = this.jwtService.verifyJWT(accessToken);
 
