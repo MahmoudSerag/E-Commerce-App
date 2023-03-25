@@ -8,26 +8,19 @@ import {
 import { HttpStatus } from '@nestjs/common';
 
 export class ErrorResponse {
-  private unauthorized() {
-    throw new UnauthorizedException({
-      success: false,
-      statusCode: HttpStatus.UNAUTHORIZED,
-      message: 'Unauthorized.',
-    });
-  }
-  private invalidToken() {
-    throw new UnauthorizedException({
-      success: false,
-      statusCode: HttpStatus.UNAUTHORIZED,
-      message: 'Invalid token.',
-    });
-  }
-
   private invalidSignature() {
     throw new UnauthorizedException({
       success: false,
       statusCode: HttpStatus.UNAUTHORIZED,
       message: 'Invalid signature.',
+    });
+  }
+
+  private jwtExpired() {
+    throw new UnauthorizedException({
+      success: false,
+      statusCode: HttpStatus.UNAUTHORIZED,
+      message: 'Jwt expired.',
     });
   }
 
@@ -55,14 +48,6 @@ export class ErrorResponse {
     });
   }
 
-  private jwtExpired() {
-    throw new UnauthorizedException({
-      success: false,
-      statusCode: HttpStatus.UNAUTHORIZED,
-      message: 'Jwt expired.',
-    });
-  }
-
   private serverError() {
     throw new InternalServerErrorException({
       success: false,
@@ -72,14 +57,12 @@ export class ErrorResponse {
   }
 
   public handleError(message: string) {
-    if (message === 'invalid signature') this.invalidSignature();
-    else if (message === 'invalid token') this.invalidToken();
-    else if (message === 'unauthorized') this.unauthorized();
-    else if (message === 'Not found.') this.notFound();
-    else if (message === 'forbidden') this.forbidden();
-    else if (message === 'jwt expired') this.jwtExpired();
-    else if (message.startsWith('Cast') || message === 'Bad request.')
-      this.badRequest();
-    else this.serverError();
+    if (message === 'invalid signature') return this.invalidSignature();
+    if (message === 'Not found.') return this.notFound();
+    if (message === 'Forbidden') return this.forbidden();
+    if (message === 'jwt expired') return this.jwtExpired();
+    if (message.startsWith('Cast') || message === 'Bad request.')
+      return this.badRequest();
+    this.serverError();
   }
 }

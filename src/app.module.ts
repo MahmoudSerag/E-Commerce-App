@@ -1,13 +1,24 @@
-import { Global, Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import {
+  Global,
+  Module,
+  NestModule,
+  MiddlewareConsumer,
+  RequestMethod,
+} from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
+import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
-import { JwtModule } from '@nestjs/jwt';
+import { AddressModule } from './address/address.module';
+
 import { JWTService } from './helpers/jwt.helper';
-import { LoggerMiddleware } from './middlewares/logger.middleware';
-import { UserController } from './user/user.controller';
 import { ErrorResponse } from 'src/helpers/errorHandling.helper';
+
+import { LoggerMiddleware } from './middlewares/logger.middleware';
+
+import { UserController } from './user/user.controller';
+
 @Global()
 @Module({
   imports: [
@@ -22,12 +33,16 @@ import { ErrorResponse } from 'src/helpers/errorHandling.helper';
     }),
     AuthModule,
     UserModule,
+    AddressModule,
   ],
   providers: [JWTService, ErrorResponse],
   exports: [JWTService, ErrorResponse],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).forRoutes(UserController);
+    consumer.apply(LoggerMiddleware).forRoutes(UserController, {
+      path: 'api/v1/address',
+      method: RequestMethod.ALL,
+    });
   }
 }

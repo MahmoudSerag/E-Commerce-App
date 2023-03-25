@@ -1,4 +1,3 @@
-import { ErrorResponse } from 'src/helpers/errorHandling.helper';
 import {
   Injectable,
   NestMiddleware,
@@ -20,7 +19,6 @@ export class LoggerMiddleware implements NestMiddleware {
         statusCode: HttpStatus.UNAUTHORIZED,
         message: 'Unauthorized.',
       });
-    // return this.errorResponse.handleError(res, 'unauthorized');
 
     const accessToken: any = req.headers.authorization.split(' ')[1];
     res.locals = accessToken;
