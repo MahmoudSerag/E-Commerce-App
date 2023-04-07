@@ -1,8 +1,9 @@
 import { ErrorResponse } from 'src/helpers/errorHandling.helper';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Res } from '@nestjs/common';
 import { EmailService } from 'src/helpers/email.helper';
 import { AuthModel } from 'src/database/models/auth.model';
 import { JWTService } from 'src/helpers/jwt.helper';
+import { Response } from 'express';
 @Injectable()
 export class AuthService {
   constructor(
@@ -11,7 +12,7 @@ export class AuthService {
     private readonly jwtService: JWTService,
     private readonly errorResponse: ErrorResponse,
   ) {}
-  async login(email: string): Promise<any> {
+  async login(@Res() res: Response, email: string): Promise<any> {
     try {
       let user = await this.authQueries.findUserByEmail(email);
 
@@ -30,25 +31,35 @@ export class AuthService {
         userId: user._id,
       };
     } catch (error) {
-      return this.errorResponse.handleError(error.message);
+      return this.errorResponse.handleError(res, 500, error.message);
     }
   }
 
-  async verifyEmail(otpCode: number, userId: string): Promise<any> {
+  async verifyEmail(
+    @Res() res: Response,
+    otpCode: number,
+    userId: string,
+  ): Promise<any> {
     try {
       const user = await this.authQueries.findUserById(userId);
 
-      if (!user) return this.errorResponse.handleError('Not found.');
+      if (!user) return this.errorResponse.handleError(res, 404, 'Not Found.');
 
-      if (!user.otpCreatedAt || !user.otpCode) {
-        return this.errorResponse.handleError('Bad request.');
-      }
+      if (!user.otpCreatedAt || !user.otpCode)
+        return this.errorResponse.handleError(
+          res,
+          400,
+          'Incorrect or expired Code.',
+        );
 
       const isOtpExpired: boolean =
         (Date.now() - user.otpCreatedAt) / (1000 * 60) >= 15;
-      if (user.otpCode !== otpCode || isOtpExpired) {
-        return this.errorResponse.handleError('Bad request.');
-      }
+      if (user.otpCode !== otpCode || isOtpExpired)
+        return this.errorResponse.handleError(
+          res,
+          400,
+          'Incorrect or expired Code.',
+        );
 
       const payload = { email: user.email, id: user._id };
       const accessToken = this.jwtService.signJWT(payload);
@@ -64,7 +75,7 @@ export class AuthService {
         accessToken,
       };
     } catch (error) {
-      return this.errorResponse.handleError(error.message);
+      return this.errorResponse.handleError(res, 500, error.message);
     }
   }
 }

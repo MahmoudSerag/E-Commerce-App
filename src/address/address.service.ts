@@ -1,7 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Res } from '@nestjs/common';
 import { AddressModel } from 'src/database/models/address.model';
 import { JWTService } from 'src/helpers/jwt.helper';
 import { ErrorResponse } from 'src/helpers/errorHandling.helper';
+import { Response } from 'express';
+
+import { addressDto } from './dto/address.dto';
 
 @Injectable()
 export class AddressService {
@@ -12,6 +15,7 @@ export class AddressService {
   ) {}
 
   async getUserAddresses(
+    @Res() res: Response,
     accessToken: string,
     page: number,
     limit = 10,
@@ -34,7 +38,43 @@ export class AddressService {
         addresses: addresses.userAddresses || [],
       };
     } catch (error) {
-      return this.errorResponse.handleError(error.message);
+      this.errorResponse.handleError(res, 500, error.message);
+    }
+  }
+
+  async addNewAddress(
+    @Res() res: Response,
+    accessToken: string,
+    body: addressDto,
+  ): Promise<any> {
+    try {
+      const decodedToken = this.jwtService.verifyJWT(accessToken);
+
+      const isPhysicalAddressUnique =
+        await this.addressModel.checkIfPhysicalAddressUnique(
+          body.physicalAddress,
+          decodedToken.id,
+        );
+
+      if (isPhysicalAddressUnique)
+        return this.errorResponse.handleError(
+          res,
+          400,
+          'physicalAddress should be unique.',
+        );
+
+      body['userId'] = decodedToken.id;
+
+      const newAddress = await this.addressModel.addNewAddress(body);
+
+      return {
+        success: true,
+        statusCode: 201,
+        message: 'New address created successfully.',
+        newAddress,
+      };
+    } catch (error) {
+      return this.errorResponse.handleError(res, 500, error.message);
     }
   }
 }

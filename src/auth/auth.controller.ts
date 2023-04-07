@@ -7,7 +7,10 @@ import {
   ValidationPipe,
   Param,
   BadRequestException,
+  Res,
+  HttpStatus,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { authDto } from './dto/auth.dto';
 import { otpCodeDto } from './dto/otp.dto';
 import {
@@ -49,14 +52,17 @@ export class AuthController {
       exceptionFactory() {
         throw new BadRequestException({
           success: false,
-          statusCode: 400,
+          statusCode: HttpStatus.BAD_REQUEST,
           message: 'Bad request',
         });
       },
     }),
   )
-  login(@Body() body: authDto): object {
-    return this.authService.login(body.email);
+  login(
+    @Res({ passthrough: true }) res: Response,
+    @Body() body: authDto,
+  ): object {
+    return this.authService.login(res, body.email);
   }
 
   @ApiParam({
@@ -86,16 +92,17 @@ export class AuthController {
       exceptionFactory() {
         throw new BadRequestException({
           success: false,
-          statusCode: 400,
+          statusCode: HttpStatus.BAD_REQUEST,
           message: 'Bad request',
         });
       },
     }),
   )
   verifyEmail(
+    @Res({ passthrough: true }) res: Response,
     @Body() body: otpCodeDto,
     @Param('userId') userId: string,
   ): object {
-    return this.authService.verifyEmail(body.otpCode, userId);
+    return this.authService.verifyEmail(res, body.otpCode, userId);
   }
 }

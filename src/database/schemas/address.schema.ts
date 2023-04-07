@@ -8,8 +8,7 @@ export const AddressSchema = new mongoose.Schema(
     },
     physicalAddress: {
       type: String,
-      unique: [true, 'physicalAddress should be unique.'],
-      required: [true, 'physicalAddress is required.'],
+      required: true,
     },
     firstName: {
       type: String,
@@ -33,6 +32,10 @@ export const AddressSchema = new mongoose.Schema(
     },
     postalCode: {
       type: Number,
+      required: true,
+    },
+    phoneNumber: {
+      type: String,
       required: true,
     },
     userId: {
