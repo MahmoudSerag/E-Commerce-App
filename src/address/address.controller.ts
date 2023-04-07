@@ -1,11 +1,26 @@
 import { AddressService } from './address.service';
-import { Get, Controller, Res, Query } from '@nestjs/common';
+import {
+  Get,
+  Controller,
+  Res,
+  Query,
+  Post,
+  Body,
+  UsePipes,
+  ValidationPipe,
+  BadRequestException,
+  HttpStatus,
+} from '@nestjs/common';
 import { Response } from 'express';
+import { addressDto } from './dto/address.dto';
 import {
   apiUnauthorizedResponse,
   apiInternalServerErrorResponse,
+  apiBadRequestResponse,
 } from 'src/helpers/swagger.helper';
 import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
   ApiInternalServerErrorResponse,
   ApiOkResponse,
   ApiSecurity,
@@ -57,6 +72,55 @@ export class AddressController {
     @Query('page') page: string,
   ): object {
     const accessToken: any = res.locals;
-    return this.addressService.getUserAddresses(accessToken, Number(page) || 1);
+    return this.addressService.getUserAddresses(
+      res,
+      accessToken,
+      Number(page) || 1,
+    );
+  }
+
+  @ApiCreatedResponse({
+    status: 201,
+    description: 'User basic info.',
+    schema: {
+      example: {
+        success: true,
+        statusCode: 201,
+        message: 'New address added.',
+        newAddress: {
+          country: 'Egypt',
+          physicalAddress: 'Cairo - Egypt',
+          firstName: 'Mahmoud',
+          lastName: 'Serag',
+          apartmentNumber: 13,
+          city: 'Shoubra',
+          governorate: 'Cairo',
+          postalCode: 11519,
+          phoneNumber: '+201064560413',
+        },
+      },
+    },
+  })
+  @ApiUnauthorizedResponse(apiUnauthorizedResponse)
+  @ApiBadRequestResponse(apiBadRequestResponse)
+  @ApiInternalServerErrorResponse(apiInternalServerErrorResponse)
+  @Post()
+  @UsePipes(
+    new ValidationPipe({
+      exceptionFactory() {
+        throw new BadRequestException({
+          success: false,
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: 'Bad request',
+        });
+      },
+    }),
+  )
+  addNewAddress(
+    @Res({ passthrough: true }) res: Response,
+    @Body() body: addressDto,
+  ): object {
+    const accessToken: any = res.locals;
+    return this.addressService.addNewAddress(res, accessToken, body);
   }
 }

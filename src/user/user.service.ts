@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Res } from '@nestjs/common';
 import { JWTService } from 'src/helpers/jwt.helper';
 import { UserModel } from 'src/database/models/user.model';
 import { ErrorResponse } from 'src/helpers/errorHandling.helper';
+import { Response } from 'express';
 @Injectable()
 export class UserService {
   constructor(
@@ -10,13 +11,16 @@ export class UserService {
     private readonly errorResponse: ErrorResponse,
   ) {}
 
-  async getUserBasicInfo(accessToken: string): Promise<any> {
+  async getUserBasicInfo(
+    @Res({ passthrough: true }) res: Response,
+    accessToken: string,
+  ): Promise<any> {
     try {
       const decodedToken = this.jwtService.verifyJWT(accessToken);
 
       const user = await this.userModel.findUserById(decodedToken.id);
 
-      if (!user) return this.errorResponse.handleError('Not found.');
+      if (!user) return this.errorResponse.handleError(res, 404, 'Not Found.');
 
       return {
         success: true,
@@ -29,11 +33,12 @@ export class UserService {
         },
       };
     } catch (error) {
-      return this.errorResponse.handleError(error.message);
+      return this.errorResponse.handleError(res, 500, error.message);
     }
   }
 
   async updateNameForLoggedInUser(
+    @Res() res: Response,
     body: { firstName: string; lastName: string },
     accessToken: string,
   ): Promise<any> {
@@ -42,7 +47,7 @@ export class UserService {
 
       const user = await this.userModel.updateUserById(decodedToken.id, body);
 
-      if (!user) return new this.errorResponse.handleError('Not found.');
+      if (!user) return this.errorResponse.handleError(res, 404, 'Not Found.');
 
       return {
         success: true,
@@ -54,7 +59,7 @@ export class UserService {
         },
       };
     } catch (error) {
-      return this.errorResponse.handleError(error.message);
+      return this.errorResponse.handleError(res, 500, error.message);
     }
   }
 }

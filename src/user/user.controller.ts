@@ -9,7 +9,7 @@ import {
   ValidationPipe,
   BadRequestException,
 } from '@nestjs/common';
-import { userInfoDto } from './dto/userInfo.dto';
+import { userInfoDto } from './dto/updateUser.dto';
 import { Response } from 'express';
 import {
   apiUnauthorizedResponse,
@@ -56,7 +56,7 @@ export class UserController {
   @Get('profile')
   getUserBasicInfo(@Res({ passthrough: true }) res: Response): object {
     const accessToken: any = res.locals;
-    return this.userService.getUserBasicInfo(accessToken);
+    return this.userService.getUserBasicInfo(res, accessToken);
   }
 
   @ApiOkResponse({
@@ -96,6 +96,6 @@ export class UserController {
     @Body() body: userInfoDto,
   ) {
     const accessToken: any = res.locals;
-    return this.userService.updateNameForLoggedInUser(body, accessToken);
+    return this.userService.updateNameForLoggedInUser(res, body, accessToken);
   }
 }

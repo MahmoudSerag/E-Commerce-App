@@ -1,68 +1,34 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  InternalServerErrorException,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
-import { HttpStatus } from '@nestjs/common';
+import { HttpStatus, Res } from '@nestjs/common';
+import { Response } from 'express';
 
 export class ErrorResponse {
-  private invalidSignature() {
-    throw new UnauthorizedException({
-      success: false,
-      statusCode: HttpStatus.UNAUTHORIZED,
-      message: 'Invalid signature.',
-    });
-  }
+  public handleError(
+    @Res() res: Response,
+    statusCode: number,
+    message: string,
+  ) {
+    if (message === 'jwt expired') {
+      statusCode = HttpStatus.UNAUTHORIZED;
+      message = 'JWT Expired.';
+    }
 
-  private jwtExpired() {
-    throw new UnauthorizedException({
-      success: false,
-      statusCode: HttpStatus.UNAUTHORIZED,
-      message: 'Jwt expired.',
-    });
-  }
+    if (message.startsWith('Cast')) {
+      statusCode = HttpStatus.BAD_REQUEST;
+      message = 'Invalid id.';
+    }
 
-  private notFound() {
-    throw new NotFoundException({
-      success: false,
-      statusCode: HttpStatus.NOT_FOUND,
-      message: 'Not found.',
-    });
-  }
+    if (message.startsWith('E11000')) {
+      statusCode = HttpStatus.BAD_REQUEST;
+      message = `${message
+        .split(':')[2]
+        .split('_')[0]
+        .trim()} should be unique.`;
+    }
 
-  private forbidden() {
-    throw new ForbiddenException({
+    res.status(statusCode || HttpStatus.INTERNAL_SERVER_ERROR).json({
       success: false,
-      statusCode: HttpStatus.FORBIDDEN,
-      message: 'Forbidden.',
+      statusCode: statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
+      message: message || 'Internal server error.',
     });
-  }
-
-  private badRequest() {
-    throw new BadRequestException({
-      success: false,
-      statusCode: HttpStatus.BAD_REQUEST,
-      message: 'Bad request.',
-    });
-  }
-
-  private serverError() {
-    throw new InternalServerErrorException({
-      success: false,
-      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-      message: 'Internal server error.',
-    });
-  }
-
-  public handleError(message: string) {
-    if (message === 'invalid signature') return this.invalidSignature();
-    if (message === 'Not found.') return this.notFound();
-    if (message === 'Forbidden') return this.forbidden();
-    if (message === 'jwt expired') return this.jwtExpired();
-    if (message.startsWith('Cast') || message === 'Bad request.')
-      return this.badRequest();
-    this.serverError();
   }
 }
