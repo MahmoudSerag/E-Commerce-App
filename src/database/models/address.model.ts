@@ -28,12 +28,23 @@ export class AddressModel {
     return await this.addressModel.create(body);
   }
 
-  async checkIfPhysicalAddressUnique(
+  async checkPhysicalAddressUniqueness(
     physicalAddress: string,
     userId: string,
   ): Promise<boolean> {
     return (await this.addressModel.findOne({ physicalAddress, userId }).lean())
       ? true
       : false;
+  }
+
+  async findAddressById(addressId: string): Promise<{ userId: string }> {
+    return await this.addressModel
+      .findById(addressId)
+      .select('userId -_id')
+      .lean();
+  }
+
+  async updateAddressById(addressId: string, body: addressDto): Promise<void> {
+    await this.addressModel.findByIdAndUpdate(addressId, body);
   }
 }

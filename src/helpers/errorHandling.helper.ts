@@ -17,14 +17,6 @@ export class ErrorResponse {
       message = 'Invalid id.';
     }
 
-    if (message.startsWith('E11000')) {
-      statusCode = HttpStatus.BAD_REQUEST;
-      message = `${message
-        .split(':')[2]
-        .split('_')[0]
-        .trim()} should be unique.`;
-    }
-
     res.status(statusCode || HttpStatus.INTERNAL_SERVER_ERROR).json({
       success: false,
       statusCode: statusCode || HttpStatus.INTERNAL_SERVER_ERROR,
