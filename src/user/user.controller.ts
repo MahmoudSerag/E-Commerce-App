@@ -55,7 +55,7 @@ export class UserController {
   @ApiInternalServerErrorResponse(apiInternalServerErrorResponse)
   @Get('profile')
   getUserBasicInfo(@Res({ passthrough: true }) res: Response): object {
-    const accessToken: any = res.locals;
+    const accessToken: any = res.locals.accessToken;
     return this.userService.getUserBasicInfo(res, accessToken);
   }
 
@@ -95,7 +95,7 @@ export class UserController {
     @Res({ passthrough: true }) res: Response,
     @Body() body: userInfoDto,
   ) {
-    const accessToken: any = res.locals;
+    const accessToken: any = res.locals.accessToken;
     return this.userService.updateNameForLoggedInUser(res, body, accessToken);
   }
 }

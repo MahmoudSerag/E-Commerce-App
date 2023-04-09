@@ -40,9 +40,12 @@ import { UserController } from './user/user.controller';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).forRoutes(UserController, {
-      path: 'api/v1/address',
-      method: RequestMethod.ALL,
-    });
+    consumer
+      .apply(LoggerMiddleware)
+      .forRoutes(
+        UserController,
+        { path: 'api/v1/address', method: RequestMethod.ALL },
+        { path: 'api/v1/address/:addressId', method: RequestMethod.ALL },
+      );
   }
 }

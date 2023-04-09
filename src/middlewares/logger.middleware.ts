@@ -12,7 +12,8 @@ export class LoggerMiddleware implements NestMiddleware {
     if (
       !req.headers ||
       !req.headers.authorization ||
-      !req.headers.authorization.startsWith('Bearer')
+      !req.headers.authorization.startsWith('Bearer') ||
+      !req.headers.authorization.split(' ')[1]
     )
       throw new UnauthorizedException({
         success: false,
@@ -21,7 +22,7 @@ export class LoggerMiddleware implements NestMiddleware {
       });
 
     const accessToken: any = req.headers.authorization.split(' ')[1];
-    res.locals = accessToken;
+    res.locals.accessToken = accessToken;
 
     next();
   }
