@@ -47,4 +47,8 @@ export class AddressModel {
   async updateAddressById(addressId: string, body: addressDto): Promise<void> {
     await this.addressModel.findByIdAndUpdate(addressId, body);
   }
+
+  async deleteAddressById(addressId: string): Promise<void> {
+    await this.addressModel.findByIdAndDelete(addressId);
+  }
 }

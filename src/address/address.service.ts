@@ -82,15 +82,7 @@ export class AddressService {
     accessToken: string,
     body: addressDto,
     addressId: string,
-  ) {
-    // Check if authorized. { Done }
-    // Check if valid body. { Done }
-    // Check if valid accessToken. { Done }
-    // Check if Forbidden user (user authorized for accessing and updating this address) { Done }.
-    // Make sure that physicalAddress is unique. { Done }
-    // Update address. { Done }
-    // Return updated address for client side. { Done }
-    // Add swagger { In progress }
+  ): Promise<any> {
     try {
       const decodedToken = this.jwtService.verifyJWT(accessToken);
 
@@ -121,6 +113,33 @@ export class AddressService {
         statusCode: 200,
         message: 'Address updated successfully.',
         updatedAddress: body,
+      };
+    } catch (error) {
+      return this.errorResponse.handleError(res, 500, error.message);
+    }
+  }
+
+  async deleteAddress(
+    @Res() res: Response,
+    accessToken: string,
+    addressId: string,
+  ): Promise<any> {
+    try {
+      const decodedToken = this.jwtService.verifyJWT(accessToken);
+
+      const address = await this.addressModel.findAddressById(addressId);
+
+      if (!address)
+        return this.errorResponse.handleError(res, 404, 'Not Found.');
+
+      if (address.userId.toString() !== decodedToken.id.toString())
+        return this.errorResponse.handleError(res, 403, 'Forbidden.');
+
+      await this.addressModel.deleteAddressById(addressId);
+      return {
+        success: true,
+        statusCode: 200,
+        message: 'Address deleted successfully.',
       };
     } catch (error) {
       return this.errorResponse.handleError(res, 500, error.message);

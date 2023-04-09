@@ -12,6 +12,7 @@ import {
   HttpStatus,
   Patch,
   Param,
+  Delete,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { addressDto } from './dto/address.dto';
@@ -137,7 +138,7 @@ export class AddressController {
       example: {
         success: true,
         statusCode: 200,
-        message: 'New address added.',
+        message: 'Address updated successfully.',
         newAddress: {
           country: 'Egypt',
           physicalAddress: 'Cairo - Egypt',
@@ -176,5 +177,30 @@ export class AddressController {
   ) {
     const accessToken = res.locals.accessToken;
     return this.addressService.updateAddress(res, accessToken, body, addressId);
+  }
+
+  @ApiOkResponse({
+    status: 204,
+    description: 'Deleted address info.',
+    schema: {
+      example: {
+        success: true,
+        statusCode: 204,
+        message: 'Address deleted successfully.',
+      },
+    },
+  })
+  @ApiUnauthorizedResponse(apiUnauthorizedResponse)
+  @ApiBadRequestResponse(apiBadRequestResponse)
+  @ApiNotFoundResponse(apiNotFoundResponse)
+  @ApiForbiddenResponse(apiForbiddenResponse)
+  @ApiInternalServerErrorResponse(apiInternalServerErrorResponse)
+  @Delete(':addressId')
+  deleteAddress(
+    @Res({ passthrough: true }) res: Response,
+    @Param('addressId') addressId: string,
+  ) {
+    const accessToken = res.locals.accessToken;
+    return this.addressService.deleteAddress(res, accessToken, addressId);
   }
 }
