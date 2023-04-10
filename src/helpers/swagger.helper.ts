@@ -53,7 +53,7 @@ export const apiInternalServerErrorResponse = {
     example: {
       success: false,
       statusCode: 500,
-      message: 'Server error.',
+      message: 'Internal server error.',
     },
   },
 };

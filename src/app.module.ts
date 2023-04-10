@@ -11,6 +11,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { AddressModule } from './address/address.module';
+import { ProductModule } from './products/product.module';
 
 import { JWTService } from './helpers/jwt.helper';
 import { ErrorResponse } from 'src/helpers/errorHandling.helper';
@@ -34,6 +35,7 @@ import { UserController } from './user/user.controller';
     AuthModule,
     UserModule,
     AddressModule,
+    ProductModule,
   ],
   providers: [JWTService, ErrorResponse],
   exports: [JWTService, ErrorResponse],
