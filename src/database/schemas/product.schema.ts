@@ -34,6 +34,22 @@ export const ProductSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    numberOfRates: {
+      type: Number,
+      default: 0,
+    },
+    sumOfRates: {
+      type: Number,
+      default: 0,
+    },
+    totalRates: {
+      type: Number,
+      default: 0,
+    },
+    bestSeller: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     timestamps: true,
