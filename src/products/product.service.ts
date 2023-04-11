@@ -14,11 +14,30 @@ export class ProductService {
     try {
       const cardSlider = await this.productModel.getCardSliderImgs();
 
+      if (!cardSlider)
+        return this.errorResponse.handleError(res, 404, 'Not Found.');
+
       return {
         success: true,
         statusCode: 200,
         message: 'Card slider imgs',
         cardSlider,
+      };
+    } catch (error) {
+      return this.errorResponse.handleError(res, 500, error.message);
+    }
+  }
+
+  async getHomePageProducts(@Res() res: Response) {
+    try {
+      const homePageProducts = await this.productModel.getHomePageProducts();
+      return {
+        success: true,
+        statusCode: 200,
+        message: 'Home page products.',
+        inStockHighestRatedProducts: homePageProducts.inStockProducts,
+        outOfStockHighestRatedProducts: homePageProducts.outOfStockProducts,
+        bestSellerProducts: homePageProducts.bestSellerProducts,
       };
     } catch (error) {
       return this.errorResponse.handleError(res, 500, error.message);
