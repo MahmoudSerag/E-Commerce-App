@@ -110,11 +110,70 @@ export class ProductModel {
     return bestSellerProducts;
   }
 
-  async getHomePageProducts() {
+  async getHomePageProducts(): Promise<{
+    inStockProducts: object[];
+    outOfStockProducts: object;
+    bestSellerProducts: object[];
+  }> {
     const inStockProducts = await this.getInStockHighestRatedProducts();
     const outOfStockProducts = await this.getOutOfStockHighestRatedProducts();
     const bestSellerProducts = await this.getBestSellerProducts();
 
     return { inStockProducts, outOfStockProducts, bestSellerProducts };
+  }
+
+  private async countFilteredProducts(query: object): Promise<number> {
+    return await this.productModel.count(query);
+  }
+
+  async getAlProducts(
+    query: {
+      page: number;
+      outOfStock: string;
+      minPrice: number;
+      maxPrice: number;
+    },
+    limit: number,
+  ): Promise<{ finalProducts: object; countedProducts: number }> {
+    type Product = {
+      _id: string;
+      name: string;
+      price: number;
+      outOfStock: boolean;
+      img: string;
+    };
+    const { outOfStock, minPrice, maxPrice } = query;
+    const finalProducts: Product[] = [];
+    const page = Number(query.page) || 1;
+    const queryOptions: any = {};
+
+    if (outOfStock === 'true' || outOfStock === 'false')
+      queryOptions.outOfStock = outOfStock;
+
+    if (Number(minPrice) && Number(maxPrice))
+      queryOptions.price = { $gte: minPrice, $lte: maxPrice };
+    else if (Number(minPrice)) queryOptions.price = { $gte: minPrice };
+    else if (Number(maxPrice)) queryOptions.price = { $lte: maxPrice };
+
+    const countedProducts = await this.countFilteredProducts(queryOptions);
+
+    const products = await this.productModel
+      .find(queryOptions)
+      .select('name price outOfStock imgs')
+      .limit(limit)
+      .skip((page - 1) * limit);
+
+    products.forEach((el) => {
+      const randomImage = Math.floor(Math.random() * el.imgs.length);
+      finalProducts.push({
+        _id: el._id,
+        name: el.name,
+        price: el.price,
+        outOfStock: el.outOfStock,
+        img: el.imgs[randomImage],
+      });
+    });
+
+    return { finalProducts, countedProducts };
   }
 }

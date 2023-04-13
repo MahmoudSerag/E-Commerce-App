@@ -53,7 +53,7 @@ export class AddressController {
         maxPages: 5,
         currentPage: 3,
         addressesPerPage: 10,
-        addresses: [
+        userAddresses: [
           {
             _id: '641ee7873cb9a8f2cd158bb4',
             country: 'egypt',

@@ -69,6 +69,7 @@ export class AuthController {
     name: 'userId',
     type: String,
     example: '64149035cf732fb7ea6ed435',
+    required: true,
   })
   @ApiCreatedResponse({
     status: 201,

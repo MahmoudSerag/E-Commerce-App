@@ -28,16 +28,53 @@ export class ProductService {
     }
   }
 
-  async getHomePageProducts(@Res() res: Response) {
+  async getHomePageProducts(@Res() res: Response): Promise<any> {
     try {
       const homePageProducts = await this.productModel.getHomePageProducts();
+      const { inStockProducts, outOfStockProducts, bestSellerProducts } =
+        homePageProducts;
+
+      if (!inStockProducts && !outOfStockProducts && !bestSellerProducts)
+        return this.errorResponse.handleError(res, 404, 'Not Found.');
+
       return {
         success: true,
         statusCode: 200,
         message: 'Home page products.',
-        inStockHighestRatedProducts: homePageProducts.inStockProducts,
-        outOfStockHighestRatedProducts: homePageProducts.outOfStockProducts,
-        bestSellerProducts: homePageProducts.bestSellerProducts,
+        inStockHighestRatedProducts: inStockProducts || [],
+        outOfStockHighestRatedProducts: outOfStockProducts || {},
+        bestSellerProducts: bestSellerProducts || [],
+      };
+    } catch (error) {
+      return this.errorResponse.handleError(res, 500, error.message);
+    }
+  }
+
+  async getAllProducts(
+    @Res() res: Response,
+    query: any,
+    limit = 10,
+  ): Promise<any> {
+    try {
+      const countedFilteredProducts = (
+        await this.productModel.getAlProducts(query, limit)
+      ).countedProducts;
+
+      const products = (await this.productModel.getAlProducts(query, limit))
+        .finalProducts;
+
+      let maxPages = countedFilteredProducts / limit;
+      if (maxPages % 1 !== 0) maxPages = Math.floor(maxPages) + 1;
+
+      return {
+        success: true,
+        statusCode: 200,
+        message: 'All products',
+        countedFilteredProducts,
+        productsPerPage: limit,
+        currentPage: query.page,
+        maxPages,
+        products: products || [],
       };
     } catch (error) {
       return this.errorResponse.handleError(res, 500, error.message);
