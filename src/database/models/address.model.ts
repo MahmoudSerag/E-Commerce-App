@@ -11,8 +11,12 @@ export class AddressModel {
     @InjectModel('Address') private readonly addressModel: Model<Address>,
   ) {}
 
-  async findUserAddresses({ userId, page, limit }): Promise<any> {
-    const numberOfAddresses = await this.addressModel.count({ userId });
+  async findUserAddresses({
+    userId,
+    page,
+    limit,
+  }): Promise<{ userAddresses: object; totalAddressesCount: number }> {
+    const totalAddressesCount = await this.addressModel.count({ userId });
 
     const userAddresses = await this.addressModel
       .find({ userId })
@@ -21,7 +25,7 @@ export class AddressModel {
       .limit(limit)
       .lean();
 
-    return { userAddresses, numberOfAddresses };
+    return { userAddresses, totalAddressesCount };
   }
 
   async addNewAddress(body: addressDto): Promise<Address> {

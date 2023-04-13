@@ -25,17 +25,26 @@ export class AddressService {
 
       const queryOptions = { userId: decodedToken.id, page, limit };
 
-      const addresses = await this.addressModel.findUserAddresses(queryOptions);
+      const totalAddressesCount = (
+        await this.addressModel.findUserAddresses(queryOptions)
+      ).totalAddressesCount;
+
+      const userAddresses = (
+        await this.addressModel.findUserAddresses(queryOptions)
+      ).userAddresses;
+
+      let maxPages = totalAddressesCount / limit;
+      if (maxPages % 1 !== 0) maxPages = Math.floor(maxPages) + 1;
 
       return {
         success: true,
         statusCode: 200,
         message: 'User addresses',
-        totalAddressesCount: addresses.numberOfAddresses,
-        maxPages: Math.floor(addresses.numberOfAddresses / limit) + 1,
-        currentPage: page,
+        totalAddressesCount,
         addressesPerPage: limit,
-        addresses: addresses.userAddresses || [],
+        maxPages,
+        currentPage: page,
+        userAddresses: userAddresses || [],
       };
     } catch (error) {
       this.errorResponse.handleError(res, 500, error.message);
