@@ -56,25 +56,53 @@ export class ProductService {
     limit = 10,
   ): Promise<any> {
     try {
-      const countedFilteredProducts = (
-        await this.productModel.getAlProducts(query, limit)
-      ).countedProducts;
+      const products = await this.productModel.getAlProducts(query, limit);
 
-      const products = (await this.productModel.getAlProducts(query, limit))
-        .finalProducts;
-
-      let maxPages = countedFilteredProducts / limit;
+      let maxPages = products.countedProducts / limit;
       if (maxPages % 1 !== 0) maxPages = Math.floor(maxPages) + 1;
 
       return {
         success: true,
         statusCode: 200,
         message: 'All products',
-        countedFilteredProducts,
+        totalIProductsCount: products.countedProducts,
         productsPerPage: limit,
         currentPage: query.page,
         maxPages,
-        products: products || [],
+        products: products.finalProducts || [],
+      };
+    } catch (error) {
+      return this.errorResponse.handleError(res, 500, error.message);
+    }
+  }
+
+  async searchProduct(
+    @Res() res: Response,
+    query: { productName: string; page: string },
+    limit = 4,
+  ) {
+    try {
+      if (!query.productName)
+        return this.errorResponse.handleError(
+          res,
+          400,
+          'Product name must be provided',
+        );
+
+      const products = await this.productModel.searchProduct(query, limit);
+
+      let maxPages = products.countedProducts / limit;
+      if (maxPages % 1 !== 0) maxPages = Math.floor(maxPages) + 1;
+
+      return {
+        success: true,
+        statusCode: 200,
+        message: 'Searched products',
+        totalIProductsCount: products.countedProducts,
+        productsPerPage: limit,
+        currentPage: query.page,
+        maxPages,
+        products: products.finalProducts || [],
       };
     } catch (error) {
       return this.errorResponse.handleError(res, 500, error.message);
