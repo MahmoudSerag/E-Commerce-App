@@ -220,4 +220,29 @@ export class ProductModel {
       )
       .lean();
   }
+
+  async getSuggestedProducts(): Promise<
+    { _id: string; name: string; price: number; img: string }[]
+  > {
+    type Product = { _id: string; name: string; price: number; img: string };
+    const finalProducts: Product[] = [];
+
+    const suggestedProducts = await this.productModel
+      .find()
+      .select('name price imgs')
+      .limit(10)
+      .lean();
+
+    suggestedProducts.forEach((el) => {
+      const randomImage = Math.floor(Math.random() * el.imgs.length);
+      finalProducts.push({
+        _id: el._id,
+        name: el.name,
+        price: el.price,
+        img: el.imgs[randomImage],
+      });
+    });
+
+    return finalProducts;
+  }
 }

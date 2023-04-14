@@ -128,4 +128,22 @@ export class ProductService {
       return this.errorResponse.handleError(res, 500, error.message);
     }
   }
+
+  async getSuggestedProducts(@Res() res: Response): Promise<any> {
+    try {
+      const suggestedProducts = await this.productModel.getSuggestedProducts();
+
+      if (!suggestedProducts)
+        return this.errorResponse.handleError(res, 404, 'Not Found.');
+
+      return {
+        success: true,
+        statusCode: true,
+        message: 'Suggested products.',
+        suggestedProducts,
+      };
+    } catch (error) {
+      return this.errorResponse.handleError(res, 500, error.message);
+    }
+  }
 }
