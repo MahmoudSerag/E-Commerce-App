@@ -33,6 +33,7 @@ import {
   ApiUnauthorizedResponse,
   ApiNotFoundResponse,
   ApiForbiddenResponse,
+  ApiParam,
 } from '@nestjs/swagger';
 
 @Controller('/api/v1/address/')
@@ -131,6 +132,12 @@ export class AddressController {
     return this.addressService.addNewAddress(res, accessToken, body);
   }
 
+  @ApiParam({
+    name: 'addressId',
+    type: String,
+    example: '64149035cf732fb7ea6ed435',
+    required: true,
+  })
   @ApiOkResponse({
     status: 200,
     description: 'Updated address info.',
@@ -179,6 +186,12 @@ export class AddressController {
     return this.addressService.updateAddress(res, accessToken, body, addressId);
   }
 
+  @ApiParam({
+    name: 'addressId',
+    type: String,
+    example: '64149035cf732fb7ea6ed435',
+    required: true,
+  })
   @ApiOkResponse({
     status: 204,
     description: 'Deleted address info.',

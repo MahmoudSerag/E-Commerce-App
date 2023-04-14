@@ -1,5 +1,5 @@
 import { ProductService } from './product.service';
-import { Controller, Res, Get, Query } from '@nestjs/common';
+import { Controller, Res, Get, Query, Param } from '@nestjs/common';
 import { Response } from 'express';
 import {
   apiInternalServerErrorResponse,
@@ -13,6 +13,7 @@ import {
   ApiTags,
   ApiQuery,
   ApiBadRequestResponse,
+  ApiParam,
 } from '@nestjs/swagger';
 
 @Controller('/api/v1/products/')
@@ -142,6 +143,29 @@ export class ProductController {
     return this.productService.getAllProducts(res, query);
   }
 
+  @ApiOkResponse({
+    status: 200,
+    description: 'Home page products.',
+    schema: {
+      example: {
+        success: true,
+        statusCode: 200,
+        message: 'All products.',
+        countedFilteredProducts: 30,
+        productsPerPage: 10,
+        currentPage: 2,
+        maxPages: 3,
+        products: [
+          {
+            _id: '643435e9dd430a8163e979d0',
+            name: 'NEON HDD T-SHIRT',
+            img: 'https://cdn.shopify.com/s/files/1/0058/4538/5314/products/lttstore_GradientHDDShirt_TransparencyFile.png?v=1635878526&width=1100',
+          },
+          `{ ............ }`,
+        ],
+      },
+    },
+  })
   @ApiQuery({ name: 'page', type: Number, example: 1, required: true })
   @ApiQuery({
     name: 'productName',
@@ -157,5 +181,56 @@ export class ProductController {
     @Query() query: { productName: string; page: string },
   ): object {
     return this.productService.searchProduct(res, query);
+  }
+
+  @ApiOkResponse({
+    status: 200,
+    description: 'Home page products.',
+    schema: {
+      example: {
+        success: true,
+        statusCode: 200,
+        message: 'Product data.',
+        products: {
+          _id: '6434128729b016ab84333d2d',
+          name: 'UNCLE LINUS HOODIE',
+          price: 59.99,
+          imgs: [
+            'https://cdn.shopify.com/s/files/1/0058/4538/5314/products/lttstore_UncleLinusPotatoSackHoodie_TransparencyFile.png?v=1680287856',
+            'https://cdn.shopify.com/s/files/1/0058/4538/5314/products/PotatoSackHoodie2000px-2.jpg?v=1680287856&width=1100',
+          ],
+          colors: ['red', 'green', 'blue'],
+          description:
+            "The fast life of YouTube ain't for everybody! If you prefer a slower, farm-grown style, then this is the hoodie for you.With a burlap-esque look",
+          sizes: [
+            'Small',
+            'Medium',
+            'Large',
+            'X-Large',
+            'XX-Large',
+            'XXX-Large',
+          ],
+          productInfo: '100% cotton',
+          outOfStock: true,
+          totalRates: 3.6,
+        },
+      },
+    },
+  })
+  @ApiParam({
+    name: 'productId',
+    type: String,
+    example: '64149035cf732fb7ea6ed435',
+    required: true,
+  })
+  @ApiNotFoundResponse(apiNotFoundResponse)
+  @ApiBadRequestResponse(apiBadRequestResponse)
+  @ApiInternalServerErrorResponse(apiInternalServerErrorResponse)
+  @Get('singleProduct/:productId')
+  getProductPage(
+    @Res({ passthrough: true }) res: Response,
+    @Param('productId') productId: string,
+  ): object {
+    return this.productService.getProductInfo(res, productId);
   }
 }

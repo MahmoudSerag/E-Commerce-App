@@ -10,7 +10,7 @@ export class ProductService {
     private productModel: ProductModel,
   ) {}
 
-  async getCardSliderImgs(@Res() res: Response) {
+  async getCardSliderImgs(@Res() res: Response): Promise<any> {
     try {
       const cardSlider = await this.productModel.getCardSliderImgs();
 
@@ -104,6 +104,26 @@ export class ProductService {
         maxPages,
         products: products.finalProducts || [],
       };
+    } catch (error) {
+      return this.errorResponse.handleError(res, 500, error.message);
+    }
+  }
+
+  async getProductInfo(@Res() res: Response, productId: string): Promise<any> {
+    try {
+      const product = await this.productModel.getProductById(productId);
+
+      if (!product)
+        return this.errorResponse.handleError(res, 404, 'Not Found.');
+
+      return {
+        success: true,
+        statusCode: 200,
+        message: 'Product data.',
+        product,
+      };
+
+      return;
     } catch (error) {
       return this.errorResponse.handleError(res, 500, error.message);
     }
