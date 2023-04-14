@@ -211,4 +211,13 @@ export class ProductModel {
 
     return { finalProducts, countedProducts };
   }
+
+  async getProductById(productId: string): Promise<Product> {
+    return await this.productModel
+      .findById(productId)
+      .select(
+        '-numberOfRates -bestSeller -sumOfRates -createdAt -updatedAt -__v',
+      )
+      .lean();
+  }
 }
