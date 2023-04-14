@@ -4,6 +4,7 @@ import { Response } from 'express';
 import {
   apiInternalServerErrorResponse,
   apiNotFoundResponse,
+  apiBadRequestResponse,
 } from 'src/helpers/swagger.helper';
 import {
   ApiOkResponse,
@@ -11,6 +12,7 @@ import {
   ApiNotFoundResponse,
   ApiTags,
   ApiQuery,
+  ApiBadRequestResponse,
 } from '@nestjs/swagger';
 
 @Controller('/api/v1/products/')
@@ -140,6 +142,15 @@ export class ProductController {
     return this.productService.getAllProducts(res, query);
   }
 
+  @ApiQuery({ name: 'page', type: Number, example: 1, required: true })
+  @ApiQuery({
+    name: 'productName',
+    type: String,
+    example: 'WINDBREAKER',
+    required: true,
+  })
+  @ApiBadRequestResponse(apiBadRequestResponse)
+  @ApiInternalServerErrorResponse(apiInternalServerErrorResponse)
   @Get('search')
   searchProduct(
     @Res({ passthrough: true }) res: Response,
