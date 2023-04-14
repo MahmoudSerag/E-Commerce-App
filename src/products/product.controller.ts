@@ -38,7 +38,7 @@ export class ProductController {
   @ApiNotFoundResponse(apiNotFoundResponse)
   @ApiInternalServerErrorResponse(apiInternalServerErrorResponse)
   @Get('slider')
-  getCardSliderImgs(@Res({ passthrough: true }) res: Response) {
+  getCardSliderImgs(@Res({ passthrough: true }) res: Response): object {
     return this.productService.getCardSliderImgs(res);
   }
 
@@ -136,7 +136,15 @@ export class ProductController {
       minPrice: number;
       maxPrice: number;
     },
-  ) {
+  ): object {
     return this.productService.getAllProducts(res, query);
+  }
+
+  @Get('search')
+  searchProduct(
+    @Res({ passthrough: true }) res: Response,
+    @Query() query: { productName: string; page: string },
+  ): object {
+    return this.productService.searchProduct(res, query);
   }
 }

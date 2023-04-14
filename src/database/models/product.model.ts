@@ -123,7 +123,7 @@ export class ProductModel {
   }
 
   private async countFilteredProducts(query: object): Promise<number> {
-    return await this.productModel.count(query);
+    return await this.productModel.count(query).lean();
   }
 
   async getAlProducts(
@@ -159,6 +159,7 @@ export class ProductModel {
 
     const products = await this.productModel
       .find(queryOptions)
+      .lean()
       .select('name price outOfStock imgs')
       .limit(limit)
       .skip((page - 1) * limit);
@@ -170,6 +171,40 @@ export class ProductModel {
         name: el.name,
         price: el.price,
         outOfStock: el.outOfStock,
+        img: el.imgs[randomImage],
+      });
+    });
+
+    return { finalProducts, countedProducts };
+  }
+
+  async searchProduct(
+    query: { productName: string; page: string },
+    limit: number,
+  ): Promise<{ finalProducts: object; countedProducts: number }> {
+    type Product = { _id: string; name: string; img: string };
+    const productName = query.productName;
+    const page = Number(query.page) || 1;
+    const finalProducts: Product[] = [];
+
+    const productQuery: any = {};
+    if (productName)
+      productQuery.name = { $regex: new RegExp(productName, 'i') };
+
+    const countedProducts = await this.countFilteredProducts(productQuery);
+
+    const products = await this.productModel
+      .find(productQuery)
+      .lean()
+      .select('name imgs')
+      .limit(limit)
+      .skip((page - 1) * limit);
+
+    products.forEach((el) => {
+      const randomImage = Math.floor(Math.random() * el.imgs.length);
+      finalProducts.push({
+        _id: el._id,
+        name: el.name,
         img: el.imgs[randomImage],
       });
     });
