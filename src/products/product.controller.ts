@@ -96,7 +96,7 @@ export class ProductController {
 
   @ApiOkResponse({
     status: 200,
-    description: 'Home page products.',
+    description: 'Product search results.',
     schema: {
       example: {
         success: true,
@@ -185,7 +185,7 @@ export class ProductController {
 
   @ApiOkResponse({
     status: 200,
-    description: 'Home page products.',
+    description: 'Product Page info.',
     schema: {
       example: {
         success: true,
@@ -232,5 +232,33 @@ export class ProductController {
     @Param('productId') productId: string,
   ): object {
     return this.productService.getProductInfo(res, productId);
+  }
+
+  @ApiOkResponse({
+    status: 200,
+    description: 'Products that related to the retrieved product.',
+    schema: {
+      example: {
+        success: true,
+        statusCode: 200,
+        message: 'Suggested product.',
+        suggestedProducts: [
+          {
+            _id: '6434128729b016ab84333d2d',
+            name: 'UNCLE LINUS HOODIE',
+            price: 59.99,
+            img: [
+              'https://cdn.shopify.com/s/files/1/0058/4538/5314/products/lttstore_UncleLinusPotatoSackHoodie_TransparencyFile.png?v=1680287856',
+            ],
+          },
+        ],
+      },
+    },
+  })
+  @ApiNotFoundResponse(apiNotFoundResponse)
+  @ApiInternalServerErrorResponse(apiInternalServerErrorResponse)
+  @Get('suggestedProducts')
+  getSuggestedProducts(@Res({ passthrough: true }) res: Response): object {
+    return this.productService.getSuggestedProducts(res);
   }
 }
