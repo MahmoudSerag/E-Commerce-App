@@ -1,11 +1,13 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { User } from 'src/user/interface/user.interface';
+import { UserInterface } from 'src/user/interface/user.interface';
 
 @Injectable()
 export class UserModel {
-  constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
+  constructor(
+    @InjectModel('User') private readonly userModel: Model<UserInterface>,
+  ) {}
 
   async findUserById(
     userId: string,

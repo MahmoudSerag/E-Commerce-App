@@ -3,12 +3,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { addressDto } from 'src/address/dto/address.dto';
-import { Address } from 'src/address/interface/address.interface';
+import { AddressInterface } from 'src/address/interface/address.interface';
 
 @Injectable()
 export class AddressModel {
   constructor(
-    @InjectModel('Address') private readonly addressModel: Model<Address>,
+    @InjectModel('Address')
+    private readonly addressModel: Model<AddressInterface>,
   ) {}
 
   async findUserAddresses({
@@ -28,7 +29,7 @@ export class AddressModel {
     return { userAddresses, totalAddressesCount };
   }
 
-  async addNewAddress(body: addressDto): Promise<Address> {
+  async addNewAddress(body: addressDto): Promise<AddressInterface> {
     return await this.addressModel.create(body);
   }
 

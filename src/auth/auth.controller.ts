@@ -6,13 +6,12 @@ import {
   UsePipes,
   ValidationPipe,
   Param,
-  BadRequestException,
   Res,
-  HttpStatus,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { authDto } from './dto/auth.dto';
 import { otpCodeDto } from './dto/otp.dto';
+import { ErrorResponse } from 'src/helpers/errorHandling.helper';
 import {
   apiInternalServerErrorResponse,
   apiBadRequestResponse,
@@ -49,12 +48,8 @@ export class AuthController {
   @Post('login')
   @UsePipes(
     new ValidationPipe({
-      exceptionFactory() {
-        throw new BadRequestException({
-          success: false,
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: 'Bad request',
-        });
+      exceptionFactory(error: object[]) {
+        ErrorResponse.validateRequestBody(error);
       },
     }),
   )
@@ -90,12 +85,8 @@ export class AuthController {
   @Post('verify-email/:userId')
   @UsePipes(
     new ValidationPipe({
-      exceptionFactory() {
-        throw new BadRequestException({
-          success: false,
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: 'Bad request',
-        });
+      exceptionFactory(error: object[]) {
+        ErrorResponse.validateRequestBody(error);
       },
     }),
   )

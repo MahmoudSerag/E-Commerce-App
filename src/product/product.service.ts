@@ -6,8 +6,8 @@ import { ProductModel } from 'src/database/models/product.model';
 @Injectable()
 export class ProductService {
   constructor(
-    private errorResponse: ErrorResponse,
-    private productModel: ProductModel,
+    private readonly errorResponse: ErrorResponse,
+    private readonly productModel: ProductModel,
   ) {}
 
   async getCardSliderImgs(@Res() res: Response): Promise<any> {

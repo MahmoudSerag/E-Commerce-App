@@ -1,6 +1,6 @@
 import { Document } from 'mongoose';
 
-export interface Address extends Document {
+export interface AddressInterface extends Document {
   country: string;
   physicalAddress?: string;
   firstName?: string;

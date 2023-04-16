@@ -1,7 +1,16 @@
-import { HttpStatus, Res } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Res } from '@nestjs/common';
 import { Response } from 'express';
 
 export class ErrorResponse {
+  static validateRequestBody(error: object[]) {
+    const message: object[] = [];
+
+    error.forEach((el) => {
+      message.push(el['constraints']);
+    });
+
+    throw new BadRequestException({ success: false, statusCode: 400, message });
+  }
   public handleError(
     @Res() res: Response,
     statusCode: number,
