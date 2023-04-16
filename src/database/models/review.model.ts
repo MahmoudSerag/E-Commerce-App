@@ -57,4 +57,8 @@ export class ReviewModel {
       createdAt: newReview['createdAt'],
     };
   }
+
+  async deleteReviewById(userId: string) {
+    return await this.reviewModel.findById(userId);
+  }
 }

@@ -43,7 +43,8 @@ export class AuthService {
     try {
       const user = await this.authQueries.findUserById(userId);
 
-      if (!user) return this.errorResponse.handleError(res, 404, 'Not Found.');
+      if (!user)
+        return this.errorResponse.handleError(res, 404, 'User Not Found.');
 
       if (!user.otpCreatedAt || !user.otpCode)
         return this.errorResponse.handleError(

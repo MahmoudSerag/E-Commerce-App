@@ -20,7 +20,8 @@ export class UserService {
 
       const user = await this.userModel.findUserById(decodedToken.id);
 
-      if (!user) return this.errorResponse.handleError(res, 404, 'Not Found.');
+      if (!user)
+        return this.errorResponse.handleError(res, 404, 'User Not Found.');
 
       return {
         success: true,
@@ -47,7 +48,8 @@ export class UserService {
 
       const user = await this.userModel.updateUserById(decodedToken.id, body);
 
-      if (!user) return this.errorResponse.handleError(res, 404, 'Not Found.');
+      if (!user)
+        return this.errorResponse.handleError(res, 404, 'User Not Found.');
 
       return {
         success: true,
