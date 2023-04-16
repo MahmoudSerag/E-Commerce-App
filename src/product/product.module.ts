@@ -13,5 +13,8 @@ import { ProductSchema } from 'src/database/schemas/product.schema';
   ],
   controllers: [ProductController],
   providers: [ProductService, ProductModel],
+  exports: [
+    MongooseModule.forFeature([{ name: 'Product', schema: ProductSchema }]),
+  ],
 })
 export class ProductModule {}

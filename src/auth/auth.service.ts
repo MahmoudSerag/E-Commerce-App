@@ -61,7 +61,12 @@ export class AuthService {
           'Incorrect or expired Code.',
         );
 
-      const payload = { email: user.email, id: user._id };
+      const payload = {
+        email: user.email,
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      };
       const accessToken = this.jwtService.signJWT(payload);
 
       user.otpCode = null;

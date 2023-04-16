@@ -8,14 +8,13 @@ import {
   Body,
   UsePipes,
   ValidationPipe,
-  BadRequestException,
-  HttpStatus,
   Patch,
   Param,
   Delete,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { addressDto } from './dto/address.dto';
+import { ErrorResponse } from 'src/helpers/errorHandling.helper';
 import {
   apiUnauthorizedResponse,
   apiInternalServerErrorResponse,
@@ -115,12 +114,8 @@ export class AddressController {
   @Post()
   @UsePipes(
     new ValidationPipe({
-      exceptionFactory() {
-        throw new BadRequestException({
-          success: false,
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: 'Bad request',
-        });
+      exceptionFactory(error: object[]) {
+        ErrorResponse.validateRequestBody(error);
       },
     }),
   )
@@ -168,12 +163,8 @@ export class AddressController {
   @Patch(':addressId')
   @UsePipes(
     new ValidationPipe({
-      exceptionFactory() {
-        throw new BadRequestException({
-          success: false,
-          statusCode: HttpStatus.BAD_REQUEST,
-          message: 'Bad request',
-        });
+      exceptionFactory(error: object[]) {
+        ErrorResponse.validateRequestBody(error);
       },
     }),
   )

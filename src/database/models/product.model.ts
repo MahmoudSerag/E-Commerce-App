@@ -2,12 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { Product } from 'src/products/interface/product.interface';
+import { ProductInterface } from 'src/product/interface/product.interface';
 
 @Injectable()
 export class ProductModel {
   constructor(
-    @InjectModel('Product') private readonly productModel: Model<Product>,
+    @InjectModel('Product')
+    private readonly productModel: Model<ProductInterface>,
   ) {}
 
   async getCardSliderImgs(): Promise<{ _id: string; img: string }[]> {
@@ -212,7 +213,7 @@ export class ProductModel {
     return { finalProducts, countedProducts };
   }
 
-  async getProductById(productId: string): Promise<Product> {
+  async getProductById(productId: string): Promise<ProductInterface> {
     return await this.productModel
       .findById(productId)
       .select(

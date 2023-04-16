@@ -2,11 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { Auth } from '../../auth/interface/auth.interface';
+import { AuthInterface } from '../../auth/interface/auth.interface';
 
 @Injectable()
 export class AuthModel {
-  constructor(@InjectModel('User') private readonly authModel: Model<Auth>) {}
+  constructor(
+    @InjectModel('User') private readonly authModel: Model<AuthInterface>,
+  ) {}
   async findUserByEmail(email: string): Promise<{ _id: string }> {
     return await this.authModel.findOne({ email }).select('_id').lean();
   }
@@ -30,6 +32,6 @@ export class AuthModel {
   async findUserById(userId: string): Promise<any> {
     return await this.authModel
       .findById(userId)
-      .select('otpCode email otpCreatedAt');
+      .select('otpCode email otpCreatedAt firstName lastName');
   }
 }

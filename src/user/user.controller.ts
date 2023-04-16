@@ -7,10 +7,10 @@ import {
   Body,
   UsePipes,
   ValidationPipe,
-  BadRequestException,
 } from '@nestjs/common';
 import { userInfoDto } from './dto/updateUser.dto';
 import { Response } from 'express';
+import { ErrorResponse } from 'src/helpers/errorHandling.helper';
 import {
   apiUnauthorizedResponse,
   apiInternalServerErrorResponse,
@@ -82,12 +82,8 @@ export class UserController {
   @UsePipes(
     new ValidationPipe({
       skipMissingProperties: true,
-      exceptionFactory() {
-        throw new BadRequestException({
-          success: false,
-          statusCode: 400,
-          message: 'Bad request',
-        });
+      exceptionFactory(error: object[]) {
+        ErrorResponse.validateRequestBody(error);
       },
     }),
   )
