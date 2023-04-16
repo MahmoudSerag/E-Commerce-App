@@ -15,7 +15,7 @@ export class ProductService {
       const cardSlider = await this.productModel.getCardSliderImgs();
 
       if (!cardSlider)
-        return this.errorResponse.handleError(res, 404, 'Not Found.');
+        return this.errorResponse.handleError(res, 404, 'Product Not Found.');
 
       return {
         success: true,
@@ -35,7 +35,7 @@ export class ProductService {
         homePageProducts;
 
       if (!inStockProducts && !outOfStockProducts && !bestSellerProducts)
-        return this.errorResponse.handleError(res, 404, 'Not Found.');
+        return this.errorResponse.handleError(res, 404, 'Product Not Found.');
 
       return {
         success: true,
@@ -114,7 +114,7 @@ export class ProductService {
       const product = await this.productModel.getProductById(productId);
 
       if (!product)
-        return this.errorResponse.handleError(res, 404, 'Not Found.');
+        return this.errorResponse.handleError(res, 404, 'Product Not Found.');
 
       return {
         success: true,
@@ -134,7 +134,7 @@ export class ProductService {
       const suggestedProducts = await this.productModel.getSuggestedProducts();
 
       if (!suggestedProducts)
-        return this.errorResponse.handleError(res, 404, 'Not Found.');
+        return this.errorResponse.handleError(res, 404, 'Product Not Found.');
 
       return {
         success: true,

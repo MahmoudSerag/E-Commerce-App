@@ -7,6 +7,7 @@ import {
   UsePipes,
   ValidationPipe,
   Body,
+  Delete,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { reviewDto } from './dto/review.dto';
@@ -20,12 +21,15 @@ import {
   ApiParam,
   ApiTags,
   ApiSecurity,
+  ApiOkResponse,
+  ApiForbiddenResponse,
 } from '@nestjs/swagger';
 import {
   apiBadRequestResponse,
   apiUnauthorizedResponse,
   apiNotFoundResponse,
   apiInternalServerErrorResponse,
+  apiForbiddenResponse,
 } from 'src/helpers/swagger.helper';
 
 @ApiTags('Review')
@@ -79,5 +83,36 @@ export class ReviewController {
     const accessToken: string = res.locals.accessToken;
 
     return this.reviewService.addNewReview(res, accessToken, productId, body);
+  }
+
+  @ApiParam({
+    name: 'reviewId',
+    type: String,
+    example: '64149035cf732fb7ea6ed435',
+    required: true,
+  })
+  @ApiOkResponse({
+    status: 200,
+    description: 'Deleted Review.',
+    schema: {
+      example: {
+        success: true,
+        statusCode: 200,
+        message: 'Review deleted successfully.',
+      },
+    },
+  })
+  @ApiUnauthorizedResponse(apiUnauthorizedResponse)
+  @ApiBadRequestResponse(apiBadRequestResponse)
+  @ApiForbiddenResponse(apiForbiddenResponse)
+  @ApiNotFoundResponse(apiNotFoundResponse)
+  @ApiInternalServerErrorResponse(apiInternalServerErrorResponse)
+  @Delete(':reviewId')
+  deleteReview(
+    @Res({ passthrough: true }) res: Response,
+    @Param('reviewId') reviewId: string,
+  ): object {
+    const accessToken = res.locals.accessToken;
+    return this.reviewService.deleteReview(res, accessToken, reviewId);
   }
 }

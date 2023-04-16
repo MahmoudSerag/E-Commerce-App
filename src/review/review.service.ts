@@ -33,7 +33,7 @@ export class ReviewService {
       const product = await this.reviewModel.getProductById(productId);
 
       if (!product)
-        return this.errorResponse.handleError(res, 404, 'Not Found.');
+        return this.errorResponse.handleError(res, 404, 'Product Not Found.');
 
       const isPurchased = await this.reviewModel.isPurchased(userId, productId);
 
@@ -63,6 +63,44 @@ export class ReviewService {
         statusCode: 201,
         message: 'Review added successfully.',
         newReview,
+      };
+    } catch (error) {
+      return this.errorResponse.handleError(res, 500, error.message);
+    }
+  }
+
+  async deleteReview(
+    @Res() res: Response,
+    accessToken: string,
+    reviewId: string,
+  ): Promise<any> {
+    try {
+      const decodedToken = this.jwtService.verifyJWT(accessToken);
+
+      const review = await this.reviewModel.deleteReviewById(reviewId);
+
+      if (!review)
+        return this.errorResponse.handleError(res, 404, 'Review Not Found.');
+
+      if (review.userId.toString() !== decodedToken.id.toString())
+        return this.errorResponse.handleError(res, 403, 'Forbidden');
+
+      const product = await this.reviewModel.getProductById(review.productId);
+
+      if (!product)
+        return this.errorResponse.handleError(res, 404, 'Product Not Found ');
+
+      product.numberOfRates -= 1;
+      product.sumOfRates -= review.rate;
+      product.totalRates = product.sumOfRates / product.numberOfRates;
+      product.save();
+
+      review.delete();
+
+      return {
+        success: true,
+        statusCode: 200,
+        message: 'Review deleted successfully.',
       };
     } catch (error) {
       return this.errorResponse.handleError(res, 500, error.message);
