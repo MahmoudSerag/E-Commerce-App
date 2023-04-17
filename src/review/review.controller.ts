@@ -8,6 +8,7 @@ import {
   ValidationPipe,
   Body,
   Delete,
+  Patch,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { reviewDto } from './dto/review.dto';
@@ -114,5 +115,50 @@ export class ReviewController {
   ): object {
     const accessToken = res.locals.accessToken;
     return this.reviewService.deleteReview(res, accessToken, reviewId);
+  }
+
+  @ApiParam({
+    name: 'reviewId',
+    type: String,
+    example: '64149035cf732fb7ea6ed435',
+    required: true,
+  })
+  @ApiOkResponse({
+    status: 200,
+    description: 'Updated Review.',
+    schema: {
+      example: {
+        success: true,
+        statusCode: 200,
+        message: 'Review updated successfully.',
+        review: {
+          _id: '643af0017bd01af6fd240990',
+          comment: 'Nice Product',
+          rate: 3,
+          updatedAt: '2023-04-17T14:34:27.036Z',
+        },
+      },
+    },
+  })
+  @ApiUnauthorizedResponse(apiUnauthorizedResponse)
+  @ApiBadRequestResponse(apiBadRequestResponse)
+  @ApiForbiddenResponse(apiForbiddenResponse)
+  @ApiNotFoundResponse(apiNotFoundResponse)
+  @ApiInternalServerErrorResponse(apiInternalServerErrorResponse)
+  @Patch(':reviewId')
+  @UsePipes(
+    new ValidationPipe({
+      exceptionFactory(error: object[]) {
+        ErrorResponse.validateRequestBody(error);
+      },
+    }),
+  )
+  updateReview(
+    @Res({ passthrough: true }) res: Response,
+    @Param('reviewId') reviewId: string,
+    @Body() body: reviewDto,
+  ) {
+    const accessToken = res.locals.accessToken;
+    return this.reviewService.updateReview(res, accessToken, reviewId, body);
   }
 }

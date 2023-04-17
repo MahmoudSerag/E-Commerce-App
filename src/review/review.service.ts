@@ -30,7 +30,7 @@ export class ReviewService {
       body.userId = userId;
       body.productId = productId;
 
-      const product = await this.reviewModel.getProductById(productId);
+      const product = await this.reviewModel.findProductById(productId);
 
       if (!product)
         return this.errorResponse.handleError(res, 404, 'Product Not Found.');
@@ -77,7 +77,7 @@ export class ReviewService {
     try {
       const decodedToken = this.jwtService.verifyJWT(accessToken);
 
-      const review = await this.reviewModel.deleteReviewById(reviewId);
+      const review = await this.reviewModel.findReviewById(reviewId);
 
       if (!review)
         return this.errorResponse.handleError(res, 404, 'Review Not Found.');
@@ -85,7 +85,7 @@ export class ReviewService {
       if (review.userId.toString() !== decodedToken.id.toString())
         return this.errorResponse.handleError(res, 403, 'Forbidden');
 
-      const product = await this.reviewModel.getProductById(review.productId);
+      const product = await this.reviewModel.findProductById(review.productId);
 
       if (!product)
         return this.errorResponse.handleError(res, 404, 'Product Not Found ');
@@ -101,6 +101,52 @@ export class ReviewService {
         success: true,
         statusCode: 200,
         message: 'Review deleted successfully.',
+      };
+    } catch (error) {
+      return this.errorResponse.handleError(res, 500, error.message);
+    }
+  }
+
+  async updateReview(
+    @Res() res: Response,
+    accessToken: string,
+    reviewId: string,
+    body: { comment: string; rate: number },
+  ) {
+    try {
+      const decodedToken = this.jwtService.verifyJWT(accessToken);
+
+      const review = await this.reviewModel.findReviewById(reviewId);
+
+      if (!review)
+        return this.errorResponse.handleError(res, 404, 'Review Not Found.');
+
+      if (review.userId.toString() !== decodedToken.id.toString())
+        return this.errorResponse.handleError(res, 403, 'Forbidden');
+
+      const product = await this.reviewModel.findProductById(review.productId);
+
+      if (!product)
+        return this.errorResponse.handleError(res, 404, 'Product Not Found.');
+
+      product.sumOfRates += body.rate - review.rate;
+      product.totalRates = product.sumOfRates / product.numberOfRates;
+      product.save();
+
+      review.rate = body.rate;
+      review.comment = body.comment;
+      review.save();
+
+      return {
+        success: true,
+        statusCode: 200,
+        message: 'Review updated successfully.',
+        review: {
+          _id: review._id,
+          comment: review.comment,
+          rate: review.rate,
+          updatedAt: review['updatedAt'],
+        },
       };
     } catch (error) {
       return this.errorResponse.handleError(res, 500, error.message);
