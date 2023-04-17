@@ -15,7 +15,7 @@ export class ReviewModel {
     private readonly productModel: Model<ProductInterface>,
   ) {}
 
-  async getProductById(productId: string): Promise<ProductInterface> {
+  async findProductById(productId: string): Promise<ProductInterface> {
     return await this.productModel.findById(productId);
   }
 
@@ -58,7 +58,7 @@ export class ReviewModel {
     };
   }
 
-  async deleteReviewById(userId: string) {
+  async findReviewById(userId: string) {
     return await this.reviewModel.findById(userId);
   }
 }
