@@ -49,6 +49,7 @@ export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(LoggerMiddleware)
+      .exclude({ path: 'api/v1/reviews/:productId', method: RequestMethod.GET })
       .forRoutes(
         UserController,
         { path: 'api/v1/address', method: RequestMethod.ALL },
