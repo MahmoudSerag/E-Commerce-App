@@ -2,6 +2,7 @@ import { ReviewService } from './review.service';
 import {
   Controller,
   Param,
+  Query,
   Post,
   Res,
   UsePipes,
@@ -9,6 +10,7 @@ import {
   Body,
   Delete,
   Patch,
+  Get,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { reviewDto } from './dto/review.dto';
@@ -160,5 +162,47 @@ export class ReviewController {
   ) {
     const accessToken = res.locals.accessToken;
     return this.reviewService.updateReview(res, accessToken, reviewId, body);
+  }
+
+  @ApiOkResponse({
+    status: 200,
+    description: 'Product reviews.',
+    schema: {
+      example: {
+        success: true,
+        statusCode: 200,
+        message: 'Product reviews',
+        totalIReviewsCount: 1,
+        reviewsPerPage: 10,
+        currentPage: 1,
+        maxPages: 1,
+        reviews: [
+          {
+            _id: '643aee5c102c810a7f015ea1',
+            userId: {
+              firstName: 'Ahmed',
+              lastName: 'Serag',
+            },
+            rate: 3,
+            comment: 'This product is amazing',
+          },
+        ],
+      },
+    },
+  })
+  @ApiBadRequestResponse(apiBadRequestResponse)
+  @ApiNotFoundResponse(apiNotFoundResponse)
+  @ApiInternalServerErrorResponse(apiInternalServerErrorResponse)
+  @Get(':productId')
+  getProductReviews(
+    @Res({ passthrough: true }) res: Response,
+    @Param('productId') productId: string,
+    @Query('page') page: string,
+  ) {
+    return this.reviewService.getProductReviews(
+      res,
+      productId,
+      Number(page) || 1,
+    );
   }
 }

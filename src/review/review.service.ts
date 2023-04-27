@@ -152,4 +152,44 @@ export class ReviewService {
       return this.errorResponse.handleError(res, 500, error.message);
     }
   }
+
+  async getProductReviews(
+    @Res() res: Response,
+    productId: string,
+    page: number,
+    limit = 10,
+  ): Promise<any> {
+    try {
+      const product = await this.reviewModel.findProductById(productId);
+
+      if (!product)
+        return this.errorResponse.handleError(res, 404, 'Product Not Found');
+
+      const countedReviews = await this.reviewModel.countProductReviews(
+        productId,
+      );
+
+      const productReviews = await this.reviewModel.getProductsReview(
+        productId,
+        page,
+        limit,
+      );
+
+      let maxPages = countedReviews / limit;
+      if (maxPages % 1 !== 0) maxPages = Math.floor(maxPages) + 1;
+
+      return {
+        success: true,
+        statusCode: 200,
+        message: 'Product reviews',
+        totalIReviewsCount: countedReviews,
+        reviewsPerPage: limit,
+        currentPage: page,
+        maxPages,
+        reviews: productReviews || [],
+      };
+    } catch (error) {
+      return this.errorResponse.handleError(res, 500, error.message);
+    }
+  }
 }
