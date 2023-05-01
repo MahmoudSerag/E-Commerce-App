@@ -7,6 +7,8 @@ import {
   ValidationPipe,
   Param,
   Res,
+  Get,
+  Query,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { ErrorResponse } from 'src/helpers/errorHandling.helper';
@@ -14,6 +16,7 @@ import {
   apiInternalServerErrorResponse,
   apiBadRequestResponse,
   apiNotFoundResponse,
+  apiUnauthorizedResponse,
 } from 'src/helpers/swagger.helper';
 import {
   ApiInternalServerErrorResponse,
@@ -22,6 +25,7 @@ import {
   ApiCreatedResponse,
   ApiParam,
   ApiTags,
+  ApiUnauthorizedResponse,
   ApiSecurity,
 } from '@nestjs/swagger';
 import { cartDto } from './dto/cart.dto';
@@ -49,6 +53,7 @@ export class CartController {
       },
     },
   })
+  @ApiUnauthorizedResponse(apiUnauthorizedResponse)
   @ApiNotFoundResponse(apiNotFoundResponse)
   @ApiBadRequestResponse(apiBadRequestResponse)
   @ApiInternalServerErrorResponse(apiInternalServerErrorResponse)
@@ -67,5 +72,16 @@ export class CartController {
   ): object {
     const accessToken = res.locals.accessToken;
     return this.cartService.addToCart(res, accessToken, productId, body);
+  }
+
+  @ApiUnauthorizedResponse(apiUnauthorizedResponse)
+  @ApiInternalServerErrorResponse(apiInternalServerErrorResponse)
+  @Get()
+  getUserCart(
+    @Res({ passthrough: true }) res: Response,
+    @Query('page') page: string,
+  ): object {
+    const accessToken = res.locals.accessToken;
+    return this.cartService.getUserCart(res, accessToken, Number(page) || 1);
   }
 }

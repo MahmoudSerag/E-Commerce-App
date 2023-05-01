@@ -6,6 +6,7 @@ export const OrderSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'User',
+      index: true,
     },
     productIds: {
       type: [mongoose.Schema.Types.ObjectId],

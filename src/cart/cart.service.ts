@@ -20,7 +20,7 @@ export class CartService {
     accessToken: string,
     productId: string,
     body: cartDto,
-  ) {
+  ): Promise<any> {
     try {
       const decodedToken = this.jwtService.verifyJWT(accessToken);
 
@@ -29,7 +29,8 @@ export class CartService {
       const queryOptions = {
         size: body.size,
         name: product.name,
-        price: product.price * body.quantity,
+        totalPrice: product.price * body.quantity,
+        productPrice: product.price,
         color: body.color,
         quantity: body.quantity,
         productId,
@@ -39,7 +40,7 @@ export class CartService {
       if (!product)
         return this.errorResponse.handleError(res, 404, 'Product Not Found.');
 
-      const cartItem = await this.cartModel.findCartItem(
+      const cartItem = await this.cartModel.findSingleCartItem(
         decodedToken.id,
         productId,
         body.size,
@@ -49,7 +50,7 @@ export class CartService {
       if (!cartItem) this.cartModel.addToCart(queryOptions);
       else {
         cartItem.quantity += body.quantity;
-        cartItem.price = product.price * cartItem.quantity;
+        cartItem.totalPrice = product.price * cartItem.quantity;
         cartItem.save();
       }
 
@@ -60,6 +61,43 @@ export class CartService {
       };
     } catch (error) {
       console.log(error);
+      return this.errorResponse.handleError(res, 500, error.message);
+    }
+  }
+
+  async getUserCart(
+    @Res() res: Response,
+    accessToken: string,
+    page: number,
+    limit = 10,
+  ): Promise<any> {
+    try {
+      const decodedToken = this.jwtService.verifyJWT(accessToken);
+
+      const countedCartItems = await this.cartModel.countUserCartItems(
+        decodedToken.id,
+      );
+
+      const userCartItems = await this.cartModel.getUserCart(
+        decodedToken.id,
+        page,
+        limit,
+      );
+
+      let maxPages = countedCartItems / limit;
+      if (maxPages % 1 !== 0) maxPages = Math.floor(maxPages) + 1;
+
+      return {
+        success: true,
+        statusCode: 200,
+        message: 'User cart.',
+        totalItemsCount: countedCartItems,
+        itemsPerPage: limit,
+        maxPages,
+        currentPage: page,
+        userCartItems: userCartItems || [],
+      };
+    } catch (error) {
       return this.errorResponse.handleError(res, 500, error.message);
     }
   }

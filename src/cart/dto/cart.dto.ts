@@ -1,7 +1,7 @@
 import { IsString, IsNotEmpty, IsEnum, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-const sizes = ['Small', 'Medium', 'Large', 'X-Large', 'XX-Large', 'XXX-Large'];
+const sizes = ['small', 'medium', 'large', 'x-large', 'xx-large', 'xxx-large'];
 const colors = [
   'red',
   'orange',
