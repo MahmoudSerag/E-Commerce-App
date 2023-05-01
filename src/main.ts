@@ -9,7 +9,7 @@ async function bootstrap() {
     origin: '*',
     methods: 'GET,PATCH,POST,DELETE',
     preflightContinue: false,
-    optionsSuccessStatus: 204,
+    optionsSuccessStatus: 200,
   });
 
   const config = new DocumentBuilder()
