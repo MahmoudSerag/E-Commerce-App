@@ -23,6 +23,10 @@ export class CartModel {
     return await this.cartModel.findOne({ userId, productId, size, color });
   }
 
+  async getCartItemById(cartId: string): Promise<CartInterface> {
+    return await this.cartModel.findById(cartId).select('userId -_id').lean();
+  }
+
   async getUserCart(
     userId: string,
     page: number,
@@ -38,5 +42,9 @@ export class CartModel {
 
   async countUserCartItems(userId: string): Promise<number> {
     return await this.cartModel.count({ userId }).lean();
+  }
+
+  async deleteCartItemById(cartId: string): Promise<void> {
+    await this.cartModel.findByIdAndDelete(cartId);
   }
 }
