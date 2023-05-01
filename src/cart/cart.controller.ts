@@ -10,6 +10,7 @@ import {
   Get,
   Query,
   Delete,
+  Patch,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { ErrorResponse } from 'src/helpers/errorHandling.helper';
@@ -33,6 +34,7 @@ import {
   ApiOkResponse,
 } from '@nestjs/swagger';
 import { cartDto } from './dto/cart.dto';
+import { updatedCartDto } from './dto/updateCart.dto';
 
 @Controller('/api/v1/cart/')
 @ApiTags('Cart')
@@ -124,12 +126,12 @@ export class CartController {
     required: true,
   })
   @ApiOkResponse({
-    status: 200,
+    status: 204,
     description: 'User cart.',
     schema: {
       example: {
         success: true,
-        statusCode: 200,
+        statusCode: 204,
         message: 'Cart item deleted successfully.',
       },
     },
@@ -145,5 +147,43 @@ export class CartController {
   ): object {
     const accessToken = res.locals.accessToken;
     return this.cartService.deleteCartItem(res, accessToken, cartId);
+  }
+
+  @ApiParam({
+    name: 'cartId',
+    type: String,
+    example: '64149035cf732fb7ea6ed435',
+    required: true,
+  })
+  @ApiOkResponse({
+    status: 200,
+    description: 'Update cart item.',
+    schema: {
+      example: {
+        success: true,
+        statusCode: 200,
+        message: 'Item updated successfully.',
+      },
+    },
+  })
+  @ApiUnauthorizedResponse(apiUnauthorizedResponse)
+  @ApiNotFoundResponse(apiNotFoundResponse)
+  @ApiForbiddenResponse(apiForbiddenResponse)
+  @ApiInternalServerErrorResponse(apiInternalServerErrorResponse)
+  @Patch(':cartId')
+  @UsePipes(
+    new ValidationPipe({
+      exceptionFactory(error: object[]) {
+        ErrorResponse.validateRequestBody(error);
+      },
+    }),
+  )
+  updateCartItem(
+    @Res({ passthrough: true }) res: Response,
+    @Param('cartId') cartId: string,
+    @Body() body: updatedCartDto,
+  ): object {
+    const accessToken = res.locals.accessToken;
+    return this.cartService.updateCartItem(res, accessToken, cartId, body);
   }
 }

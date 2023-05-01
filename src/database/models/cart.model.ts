@@ -24,7 +24,7 @@ export class CartModel {
   }
 
   async getCartItemById(cartId: string): Promise<CartInterface> {
-    return await this.cartModel.findById(cartId).select('userId -_id').lean();
+    return await this.cartModel.findById(cartId);
   }
 
   async getUserCart(
@@ -46,5 +46,15 @@ export class CartModel {
 
   async deleteCartItemById(cartId: string): Promise<void> {
     await this.cartModel.findByIdAndDelete(cartId);
+  }
+
+  async updateCartItem(
+    cartItem: CartInterface,
+    quantity: number,
+  ): Promise<void> {
+    cartItem.quantity = quantity;
+    cartItem.totalPrice = cartItem.quantity * cartItem.productPrice;
+
+    await cartItem.save();
   }
 }

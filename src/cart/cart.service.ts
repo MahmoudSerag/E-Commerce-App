@@ -5,6 +5,7 @@ import { CartModel } from 'src/database/models/cart.model';
 import { ProductModel } from 'src/database/models/product.model';
 import { Response } from 'express';
 import { cartDto } from './dto/cart.dto';
+import { updatedCartDto } from './dto/updateCart.dto';
 
 @Injectable()
 export class CartService {
@@ -122,8 +123,40 @@ export class CartService {
 
       return {
         success: true,
-        statusCode: 200,
+        statusCode: 204,
         message: 'Cart item deleted successfully.',
+      };
+    } catch (error) {
+      return this.errorResponse.handleError(res, 500, error.message);
+    }
+  }
+
+  async updateCartItem(
+    @Res() res: Response,
+    accessToken: string,
+    cartId: string,
+    body: updatedCartDto,
+  ): Promise<any> {
+    try {
+      const decodedToken = this.jwtService.verifyJWT(accessToken);
+
+      const cartItem = await this.cartModel.getCartItemById(cartId);
+
+      if (!cartItem)
+        return this.errorResponse.handleError(res, 404, 'Item Not Found.');
+
+      if (cartItem.userId.toString() !== decodedToken.id)
+        return this.errorResponse.handleError(res, 403, 'Forbidden.');
+
+      if (body.quantity === 0)
+        return await this.cartModel.deleteCartItemById(cartItem._id);
+
+      await this.cartModel.updateCartItem(cartItem, body.quantity);
+
+      return {
+        success: true,
+        statusCode: 200,
+        message: 'Item updated successfully.',
       };
     } catch (error) {
       return this.errorResponse.handleError(res, 500, error.message);
