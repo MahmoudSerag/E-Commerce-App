@@ -58,6 +58,7 @@ export class AppModule implements NestModule {
         { path: 'api/v1/address/:addressId', method: RequestMethod.ALL },
         ReviewController,
         { path: 'api/v1/cart/:productId', method: RequestMethod.ALL },
+        { path: 'api/v1/cart/', method: RequestMethod.ALL },
       );
   }
 }

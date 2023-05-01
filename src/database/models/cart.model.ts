@@ -14,12 +14,29 @@ export class CartModel {
     await this.cartModel.create(body);
   }
 
-  async findCartItem(
+  async findSingleCartItem(
     userId: string,
     productId: string,
     size: string,
     color: string,
   ): Promise<CartInterface> {
     return await this.cartModel.findOne({ userId, productId, size, color });
+  }
+
+  async getUserCart(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<CartInterface> {
+    return await this.cartModel
+      .find({ userId })
+      .select('productId name productPrice totalPrice color quantity size')
+      .limit(limit)
+      .skip((page - 1) * limit)
+      .lean();
+  }
+
+  async countUserCartItems(userId: string): Promise<number> {
+    return await this.cartModel.count({ userId }).lean();
   }
 }

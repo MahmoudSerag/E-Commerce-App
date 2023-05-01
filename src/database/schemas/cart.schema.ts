@@ -10,7 +10,11 @@ export const CartSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    price: {
+    productPrice: {
+      type: Number,
+      required: true,
+    },
+    totalPrice: {
       type: Number,
       required: true,
     },
@@ -26,11 +30,13 @@ export const CartSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'User',
+      index: true,
     },
     productId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'Product',
+      index: true,
     },
   },
   {
