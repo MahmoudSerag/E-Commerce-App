@@ -101,4 +101,32 @@ export class CartService {
       return this.errorResponse.handleError(res, 500, error.message);
     }
   }
+
+  async deleteCartItem(
+    @Res() res: Response,
+    accessToken: string,
+    cartId: string,
+  ): Promise<any> {
+    try {
+      const decodedToken = this.jwtService.verifyJWT(accessToken);
+
+      const cartItem = await this.cartModel.getCartItemById(cartId);
+
+      if (!cartItem)
+        return this.errorResponse.handleError(res, 404, 'Item Not Found.');
+
+      if (cartItem.userId.toString() !== decodedToken.id)
+        return this.errorResponse.handleError(res, 403, 'Forbidden.');
+
+      await this.cartModel.deleteCartItemById(cartId);
+
+      return {
+        success: true,
+        statusCode: 200,
+        message: 'Cart item deleted successfully.',
+      };
+    } catch (error) {
+      return this.errorResponse.handleError(res, 500, error.message);
+    }
+  }
 }

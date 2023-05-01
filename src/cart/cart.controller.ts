@@ -9,6 +9,7 @@ import {
   Res,
   Get,
   Query,
+  Delete,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { ErrorResponse } from 'src/helpers/errorHandling.helper';
@@ -17,6 +18,7 @@ import {
   apiBadRequestResponse,
   apiNotFoundResponse,
   apiUnauthorizedResponse,
+  apiForbiddenResponse,
 } from 'src/helpers/swagger.helper';
 import {
   ApiInternalServerErrorResponse,
@@ -27,6 +29,8 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
   ApiSecurity,
+  ApiForbiddenResponse,
+  ApiOkResponse,
 } from '@nestjs/swagger';
 import { cartDto } from './dto/cart.dto';
 
@@ -74,6 +78,34 @@ export class CartController {
     return this.cartService.addToCart(res, accessToken, productId, body);
   }
 
+  @ApiOkResponse({
+    status: 200,
+    description: 'User cart.',
+    schema: {
+      example: {
+        success: true,
+        statusCode: 200,
+        message: 'User cart.',
+        totalItemsCount: 14,
+        itemsPerPage: 10,
+        maxPages: 2,
+        currentPage: 1,
+        userCartItems: [
+          {
+            _id: '64501725c793057fac35843d',
+            size: 'XX-Large',
+            name: 'NEON MOTHERBOARD T-SHIRT',
+            productPrice: 19.99,
+            totalPrice: 79.96,
+            color: 'blue',
+            quantity: 4,
+            productId: '643417b02e1b398d93b11eef',
+          },
+          `{ ............. }`,
+        ],
+      },
+    },
+  })
   @ApiUnauthorizedResponse(apiUnauthorizedResponse)
   @ApiInternalServerErrorResponse(apiInternalServerErrorResponse)
   @Get()
@@ -83,5 +115,35 @@ export class CartController {
   ): object {
     const accessToken = res.locals.accessToken;
     return this.cartService.getUserCart(res, accessToken, Number(page) || 1);
+  }
+
+  @ApiParam({
+    name: 'cartId',
+    type: String,
+    example: '64149035cf732fb7ea6ed435',
+    required: true,
+  })
+  @ApiOkResponse({
+    status: 200,
+    description: 'User cart.',
+    schema: {
+      example: {
+        success: true,
+        statusCode: 200,
+        message: 'Cart item deleted successfully.',
+      },
+    },
+  })
+  @ApiUnauthorizedResponse(apiUnauthorizedResponse)
+  @ApiNotFoundResponse(apiNotFoundResponse)
+  @ApiForbiddenResponse(apiForbiddenResponse)
+  @ApiInternalServerErrorResponse(apiInternalServerErrorResponse)
+  @Delete(':cartId')
+  deleteItemFromCart(
+    @Res({ passthrough: true }) res: Response,
+    @Param('cartId') cartId: string,
+  ): object {
+    const accessToken = res.locals.accessToken;
+    return this.cartService.deleteCartItem(res, accessToken, cartId);
   }
 }
