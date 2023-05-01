@@ -14,6 +14,7 @@ import { AddressModule } from './address/address.module';
 import { ProductModule } from './product/product.module';
 import { ReviewModule } from './review/review.module';
 import { OrderModule } from './order/order.module';
+import { CartModule } from './cart/cart.module';
 
 import { JWTService } from './helpers/jwt.helper';
 import { ErrorResponse } from 'src/helpers/errorHandling.helper';
@@ -41,6 +42,7 @@ import { ReviewController } from './review/review.controller';
     ProductModule,
     ReviewModule,
     OrderModule,
+    CartModule,
   ],
   providers: [JWTService, ErrorResponse],
   exports: [JWTService, ErrorResponse],
@@ -55,6 +57,7 @@ export class AppModule implements NestModule {
         { path: 'api/v1/address', method: RequestMethod.ALL },
         { path: 'api/v1/address/:addressId', method: RequestMethod.ALL },
         ReviewController,
+        { path: 'api/v1/cart/:productId', method: RequestMethod.ALL },
       );
   }
 }
