@@ -1,24 +1,5 @@
 import * as mongoose from 'mongoose';
 
-const PaymentSchema = new mongoose.Schema({
-  cardNumber: {
-    type: Number,
-    required: true,
-  },
-  careExpireDate: {
-    type: Date,
-    required: true,
-  },
-  CVV: {
-    type: Number,
-    required: true,
-  },
-  nameOnCard: {
-    type: String,
-    required: false,
-  },
-});
-
 export const UserSchema = new mongoose.Schema(
   {
     email: {
@@ -43,7 +24,30 @@ export const UserSchema = new mongoose.Schema(
       default: null,
     },
     paymentInfo: {
-      type: PaymentSchema,
+      cardNumber: {
+        type: Number,
+        required: true,
+      },
+      expirationMonth: {
+        type: Number,
+        required: true,
+      },
+      expirationYear: {
+        type: Number,
+        required: true,
+      },
+      paymentId: {
+        type: String,
+        required: true,
+      },
+      CVC: {
+        type: String,
+        required: true,
+      },
+      nameOnCard: {
+        type: String,
+        required: false,
+      },
       _id: false,
       required: false,
     },

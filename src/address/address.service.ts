@@ -25,13 +25,8 @@ export class AddressService {
 
       const queryOptions = { userId: decodedToken.id, page, limit };
 
-      const totalAddressesCount = (
-        await this.addressModel.findUserAddresses(queryOptions)
-      ).totalAddressesCount;
-
-      const userAddresses = (
-        await this.addressModel.findUserAddresses(queryOptions)
-      ).userAddresses;
+      const { totalAddressesCount, userAddresses } =
+        await this.addressModel.findUserAddresses(queryOptions);
 
       let maxPages = totalAddressesCount / limit;
       if (maxPages % 1 !== 0) maxPages = Math.floor(maxPages) + 1;

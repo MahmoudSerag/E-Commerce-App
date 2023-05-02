@@ -2,6 +2,10 @@ import * as mongoose from 'mongoose';
 
 export const OrderSchema = new mongoose.Schema(
   {
+    price: {
+      type: Number,
+      required: true,
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
