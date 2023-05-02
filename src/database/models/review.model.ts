@@ -22,9 +22,19 @@ export class ReviewModel {
   }
 
   async isPurchased(userId: string, productId: string): Promise<boolean> {
-    return (await this.orderModel.findOne({ userId, productId }).lean())
-      ? true
-      : false;
+    const userOrders = await this.orderModel
+      .find({ userId })
+      .select('productIds -_id')
+      .lean();
+
+    for (let i = 0; i < userOrders.length; i++) {
+      for (let j = 0; j < userOrders[i].productIds.length; j++) {
+        if (userOrders[i].productIds[j].toString() === productId.toString())
+          return true;
+      }
+    }
+
+    return false;
   }
 
   async isReviewed(userId: string, productId: string): Promise<boolean> {

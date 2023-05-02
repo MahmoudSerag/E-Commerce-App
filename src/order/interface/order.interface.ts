@@ -1,6 +1,7 @@
 import { Document } from 'mongoose';
 
 export interface OrderInterface extends Document {
-  userId: string;
-  productIds: string[];
+  readonly price: number;
+  readonly userId: string;
+  readonly productIds: object[];
 }

@@ -41,6 +41,7 @@ export const AddressSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
+      index: true,
       ref: 'User',
     },
   },
