@@ -36,7 +36,7 @@ Overall, the e-commerce app provides a seamless shopping experience that is secu
 
 ### Documentation
 
-[Here](https://e-commerce-app-production-3b7f.up.railway.app/api/docs)
+[Here](https://e-commerce-app-production-b6a7.up.railway.app/api/docs)
 
 ## Installation
 
