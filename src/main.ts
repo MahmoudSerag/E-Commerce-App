@@ -28,7 +28,6 @@ async function bootstrap() {
       },
       'JWT-auth',
     )
-    .addServer(process.env.SERVER_DOMAIN)
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document, {
